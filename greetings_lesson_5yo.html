@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hello! 👋</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;700;900&display=swap');
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --sky:      #D0EEFF;
+    --mid:      #B8E0FF;
+    --grass:    #78C850;
+    --sun:      #FFD700;
+    --hello:    #5B8DEF;
+    --feeling:  #FF7043;
+    --bye:      #9C6FE4;
+    --correct:  #43A047;
+    --wrong:    #E53935;
+    --card:     #ffffff;
+    --text:     #2c2c2c;
+  }
+
+  body {
+    font-family: 'Nunito', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 10px 10px 40px;
+    overflow-x: hidden;
+    position: relative;
+    background: linear-gradient(180deg, var(--sky) 0%, var(--mid) 55%, var(--grass) 55%, #5aab3a 100%);
+  }
+
+  /* Sun */
+  .sun {
+    position: fixed; top: 14px; right: 36px;
+    font-size: 62px;
+    animation: sunSpin 12s linear infinite;
+    pointer-events: none;
+    filter: drop-shadow(0 0 16px #FFD70088);
+  }
+  @keyframes sunSpin { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
+
+  /* Stars (night mode for goodbye) */
+  .star-deco {
+    position: fixed; font-size: 28px; opacity: 0;
+    pointer-events: none; transition: opacity 1s;
+  }
+  .star-deco.show { opacity: 0.7; animation: twinkle 2s ease-in-out infinite; }
+  .star-deco:nth-child(1){ top:8%;  left:8%;  animation-delay:0s; }
+  .star-deco:nth-child(2){ top:12%; left:70%; animation-delay:0.4s; }
+  .star-deco:nth-child(3){ top:22%; left:45%; animation-delay:0.9s; }
+  @keyframes twinkle { 0%,100%{opacity:0.7} 50%{opacity:0.2} }
+
+  /* Clouds */
+  .cloud { position:fixed; font-size:48px; opacity:0.8; pointer-events:none; animation: driftCloud linear infinite; }
+  .cloud:nth-child(4){ top:28px; animation-duration:22s; animation-delay:0s; }
+  .cloud:nth-child(5){ top:70px; font-size:32px; animation-duration:30s; animation-delay:-12s; }
+  @keyframes driftCloud { from{left:-120px} to{left:110%} }
+
+  /* Screens */
+  .screen { display:none; width:100%; max-width:680px; flex-direction:column; align-items:center; }
+  .screen.active { display:flex; }
+
+  /* ── TITLE ── */
+  .title-box {
+    background: var(--card);
+    border-radius: 32px;
+    padding: 42px 52px;
+    text-align: center;
+    box-shadow: 0 10px 40px rgba(91,141,239,0.22);
+    margin-top: 55px;
+    animation: bounceIn 0.6s ease;
+  }
+  .title-emoji { font-size: 86px; display:block; margin-bottom:8px; }
+  .title-text  { font-family:'Fredoka One',sans-serif; font-size:58px; color:var(--hello); }
+  .subtitle    { font-size:19px; color:#aaa; margin-top:6px; }
+
+  .big-btn {
+    margin-top: 28px;
+    background: var(--hello);
+    color: #fff;
+    border: none; border-radius: 50px;
+    padding: 17px 50px;
+    font-size: 26px;
+    font-family: 'Fredoka One', sans-serif;
+    cursor: pointer;
+    box-shadow: 0 6px 0 #3a6ac8;
+    transition: all 0.15s;
+    animation: wiggle 2.5s ease-in-out infinite;
+  }
+  .big-btn:hover  { transform:translateY(-3px); box-shadow:0 9px 0 #3a6ac8; }
+  .big-btn:active { transform:translateY(3px);  box-shadow:0 3px 0 #3a6ac8; }
+  @keyframes wiggle {
+    0%,88%,100%{transform:rotate(0deg)}
+    91%{transform:rotate(-3deg)} 95%{transform:rotate(3deg)}
+  }
+  @keyframes bounceIn {
+    0%{transform:scale(0.5);opacity:0} 70%{transform:scale(1.05)} 100%{transform:scale(1);opacity:1}
+  }
+
+  /* ── NAV TABS ── */
+  .tab-bar {
+    display: flex; gap: 0; margin-bottom: 14px;
+    background: rgba(0,0,0,0.65);
+    border-radius: 50px; padding: 5px;
+    flex-wrap: wrap; justify-content: center;
+  }
+  .tab-btn {
+    background: transparent;
+    border: none; border-radius: 40px;
+    padding: 8px 18px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 14px; font-weight: 700;
+    color: rgba(255,255,255,0.65);
+    cursor: pointer; transition: all 0.2s;
+  }
+  .tab-btn:hover { color:#fff; background:rgba(255,255,255,0.15); }
+  .tab-btn.active-hello   { background:var(--hello);   color:#fff; }
+  .tab-btn.active-feeling { background:var(--feeling);  color:#fff; }
+  .tab-btn.active-bye     { background:var(--bye);     color:#fff; }
+
+  /* ── STAR BAR ── */
+  .star-bar { display:flex; gap:6px; font-size:26px; margin-bottom:8px; min-height:34px; }
+
+  /* ── SECTION LABEL ── */
+  .section-label {
+    font-family: 'Fredoka One', sans-serif;
+    font-size: 22px; border-radius: 50px;
+    padding: 6px 24px; color:#fff; margin-bottom:12px;
+  }
+  .label-hello   { background:var(--hello); }
+  .label-feeling { background:var(--feeling); }
+  .label-bye     { background:var(--bye); }
+
+  /* ── GREETING CARD ── */
+  .greet-card {
+    background: var(--card);
+    border-radius: 30px;
+    padding: 30px 30px 24px;
+    text-align: center;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+    width: 100%; max-width: 500px;
+    animation: slideIn 0.4s ease;
+  }
+  @keyframes slideIn { from{transform:translateX(60px);opacity:0} to{transform:translateX(0);opacity:1} }
+
+  .greet-emoji {
+    font-size: 110px; display:block; cursor:pointer;
+    line-height:1.2;
+    filter: drop-shadow(0 4px 10px rgba(0,0,0,0.16));
+    transition: transform 0.2s;
+  }
+  .greet-emoji:hover  { transform:scale(1.12) rotate(-6deg); }
+  .greet-emoji:active { transform:scale(0.92); }
+
+  .greet-word {
+    font-family: 'Fredoka One', sans-serif;
+    font-size: 56px; color:var(--hello);
+    margin: 10px 0 4px;
+  }
+  .greet-sub  { font-size:17px; color:#bbb; font-style:italic; margin-bottom:10px; }
+  .tap-me     { font-size:14px; color:#ccc; animation:blink 2s infinite; }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.25} }
+
+  .nav-row { display:flex; gap:14px; margin-top:16px; justify-content:center; }
+  .nav-btn {
+    background:#fff; border:3px solid #ddd; border-radius:50px;
+    padding:10px 24px; font-size:19px;
+    font-family:'Nunito',sans-serif; font-weight:700;
+    cursor:pointer; transition:all 0.15s; color:var(--text);
+  }
+  .nav-btn:hover { border-color:var(--hello); color:var(--hello); transform:scale(1.05); }
+  .nav-btn.primary { background:var(--hello); color:#fff; border-color:var(--hello); }
+  .nav-btn.primary:hover { border-color:var(--hello); color:#fff; }
+
+  /* ── HOW ARE YOU ── */
+  .how-card {
+    background: var(--card);
+    border-radius: 30px;
+    padding: 24px 20px;
+    text-align: center;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+    width: 100%; max-width: 580px;
+    animation: slideIn 0.4s ease;
+  }
+  .how-question {
+    font-family: 'Fredoka One', sans-serif;
+    font-size: 36px; color:var(--feeling);
+    margin-bottom: 18px;
+  }
+  .feelings-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+  }
+  .feeling-btn {
+    background: #fafafa;
+    border: 4px solid #ececec;
+    border-radius: 20px;
+    padding: 16px 8px 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex; flex-direction:column; align-items:center; gap:6px;
+  }
+  .feeling-btn:hover { transform:scale(1.08); border-color:var(--feeling); background:#fff8f5; }
+  .feeling-btn.selected {
+    border-color: var(--feeling);
+    background: #fff0eb;
+    animation: correctBounce 0.5s ease;
+  }
+  .feeling-emoji { font-size:52px; line-height:1; }
+  .feeling-word  { font-family:'Fredoka One',sans-serif; font-size:17px; color:var(--text); }
+
+  .response-bubble {
+    margin-top: 16px;
+    background: linear-gradient(135deg, var(--feeling), #ff9a6c);
+    color: #fff;
+    border-radius: 20px;
+    padding: 14px 20px;
+    font-family: 'Fredoka One', sans-serif;
+    font-size: 26px;
+    display: none;
+    animation: popIn 0.4s ease;
+  }
+  .response-bubble.show { display:block; }
+  @keyframes popIn { from{transform:scale(0.7);opacity:0} to{transform:scale(1);opacity:1} }
+
+  .next-section-btn {
+    margin-top: 14px;
+    background: var(--feeling);
+    color: #fff; border:none; border-radius:50px;
+    padding: 12px 32px;
+    font-family: 'Fredoka One', sans-serif;
+    font-size: 20px; cursor:pointer;
+    box-shadow: 0 5px 0 #c0471a;
+    transition: all 0.15s;
+    display: none;
+  }
+  .next-section-btn.show { display:inline-block; }
+  .next-section-btn:hover  { transform:translateY(-2px); box-shadow:0 7px 0 #c0471a; }
+  .next-section-btn:active { transform:translateY(2px);  box-shadow:0 3px 0 #c0471a; }
+
+  /* ── GOODBYE ── */
+  .bye-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 16px;
+    width: 100%; max-width: 480px;
+  }
+  .bye-card {
+    background: var(--card);
+    border-radius: 24px;
+    padding: 22px 28px;
+    display: flex; align-items:center; gap:20px;
+    box-shadow: 0 6px 22px rgba(0,0,0,0.1);
+    cursor: pointer;
+    transition: all 0.2s;
+    border: 3px solid transparent;
+    animation: slideIn 0.4s ease;
+  }
+  .bye-card:hover { transform:scale(1.03); border-color:var(--bye); }
+  .bye-card.tapped { border-color:var(--bye); background:#f5f0ff; }
+  .bye-emoji { font-size:62px; flex-shrink:0; }
+  .bye-text  { text-align:left; }
+  .bye-word  { font-family:'Fredoka One',sans-serif; font-size:30px; color:var(--bye); }
+  .bye-sub   { font-size:15px; color:#aaa; margin-top:3px; }
+
+  /* ── FEEDBACK ── */
+  .feedback {
+    position:fixed; top:50%; left:50%;
+    transform:translate(-50%,-50%);
+    font-size:96px; pointer-events:none; z-index:999;
+    display:none; animation:feedbackPop 1s ease forwards;
+  }
+  @keyframes feedbackPop {
+    0%  {transform:translate(-50%,-50%) scale(0); opacity:1;}
+    50% {transform:translate(-50%,-62%) scale(1.2); opacity:1;}
+    100%{transform:translate(-50%,-82%) scale(0.9); opacity:0;}
+  }
+
+  /* ── WIN ── */
+  .win-box {
+    background: var(--card);
+    border-radius: 30px; padding:44px;
+    text-align:center;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.18);
+    max-width:460px; animation:bounceIn 0.6s ease;
+  }
+  .win-emoji { font-size:80px; display:block; }
+  .win-title { font-family:'Fredoka One',sans-serif; font-size:44px; color:var(--bye); margin:12px 0; }
+  .win-sub   { font-size:18px; color:#888; }
+
+  @keyframes correctBounce {
+    0%{transform:scale(1)} 40%{transform:scale(1.18)} 70%{transform:scale(0.96)} 100%{transform:scale(1)}
+  }
+</style>
+</head>
+<body>
+
+<!-- Decorations -->
+<div class="sun">☀️</div>
+<div class="star-deco" id="star1">⭐</div>
+<div class="star-deco" id="star2">🌟</div>
+<div class="star-deco" id="star3">✨</div>
+<div class="cloud">☁️</div>
+<div class="cloud">☁️</div>
+
+<!-- ══════════════════════ TITLE ══════════════════════ -->
+<div class="screen active" id="screen-title">
+  <div class="title-box">
+    <span class="title-emoji">👋</span>
+    <div class="title-text">Hello!</div>
+    <div class="subtitle">Let's learn how to say hello 😊</div>
+    <button class="big-btn" onclick="startLesson()">▶ START</button>
+  </div>
+</div>
+
+<!-- ══════════════════════ MAIN LESSON ══════════════════════ -->
+<div class="screen" id="screen-main">
+
+  <!-- Tab bar -->
+  <div class="tab-bar">
+    <button class="tab-btn active-hello" id="tab-hello"   onclick="setSection('hello')">👋 Hello</button>
+    <button class="tab-btn"             id="tab-feeling"  onclick="setSection('feeling')">😊 How are you?</button>
+    <button class="tab-btn"             id="tab-bye"      onclick="setSection('bye')">🌙 Goodbye</button>
+  </div>
+
+  <div class="star-bar" id="star-bar"></div>
+
+  <!-- ── HELLO section ── -->
+  <div id="sec-hello">
+    <div class="section-label label-hello">👋 Say hello!</div>
+    <div class="greet-card" id="hello-card">
+      <span class="greet-emoji" id="hello-emoji" onclick="tapGreeting()">👋</span>
+      <div class="greet-word"   id="hello-word">HELLO!</div>
+      <div class="greet-sub"    id="hello-sub">🔊 "hel-lo"</div>
+      <div class="tap-me">👆 Tap to wave!</div>
+      <div class="nav-row">
+        <button class="nav-btn" onclick="prevGreeting()">⬅ Back</button>
+        <button class="nav-btn primary" onclick="nextGreeting()">Next ➡</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── HOW ARE YOU section ── -->
+  <div id="sec-feeling" style="display:none; width:100%; max-width:580px; display:none; flex-direction:column; align-items:center;">
+    <div class="section-label label-feeling">😊 How are you?</div>
+    <div class="how-card">
+      <div class="how-question">How are you? 😊</div>
+      <div class="feelings-grid" id="feelings-grid"></div>
+      <div class="response-bubble" id="response-bubble">I am happy! 😊</div>
+      <button class="next-section-btn" id="next-bye-btn" onclick="setSection('bye')">Goodbye ➡</button>
+    </div>
+  </div>
+
+  <!-- ── GOODBYE section ── -->
+  <div id="sec-bye" style="display:none; width:100%; max-width:480px; display:none; flex-direction:column; align-items:center;">
+    <div class="section-label label-bye">🌙 Goodbye!</div>
+    <div class="bye-grid" id="bye-grid"></div>
+  </div>
+
+</div>
+
+<!-- ══════════════════════ WIN ══════════════════════ -->
+<div class="screen" id="screen-win">
+  <div class="win-box">
+    <span class="win-emoji">🎉</span>
+    <div class="win-title">See you next time!</div>
+    <div class="win-stars" id="win-stars">⭐⭐⭐</div>
+    <div class="win-sub">Great lesson today! 🌟</div>
+    <button class="big-btn" style="margin-top:22px; background:var(--bye); box-shadow:0 6px 0 #6a3fb5;" onclick="restart()">Again 🔄</button>
+  </div>
+</div>
+
+<!-- Feedback -->
+<div class="feedback" id="feedback"></div>
+
+<script>
+// ─── DATA ────────────────────────────────────────────────────────────────────
+const greetings = [
+  { emoji:'👋', word:'HELLO!',       sub:'🔊 "hel-lo"',       hint:'Wave your hand!' },
+  { emoji:'😄', word:'HI!',          sub:'🔊 "hi"',            hint:'Smile and wave!' },
+  { emoji:'🌞', word:'GOOD MORNING!',sub:'🔊 "good mor-ning"', hint:'Stretch your arms up!' },
+];
+
+const feelings = [
+  { emoji:'😊', word:'HAPPY',    response:'I am happy! 😊' },
+  { emoji:'😢', word:'SAD',      response:'I am sad. 😢' },
+  { emoji:'😴', word:'TIRED',    response:'I am tired. 😴' },
+  { emoji:'😒', word:'BORED',    response:'I am bored. 😒' },
+  { emoji:'😠', word:'ANGRY',    response:"I am angry! 😠" },
+  { emoji:'🤩', word:'EXCITED',  response:'I am excited! 🤩' },
+];
+
+const goodbyes = [
+  { emoji:'👋', word:'GOODBYE!',          sub:'Wave both hands!' },
+  { emoji:'✌️',  word:'BYE BYE!',          sub:'Wave two fingers!' },
+  { emoji:'🗓️', word:'SEE YOU NEXT TIME!', sub:'Point to the future!' },
+  { emoji:'🌟', word:'GOOD JOB TODAY!',    sub:'Give a big thumbs up!' },
+];
+
+// ─── STATE ───────────────────────────────────────────────────────────────────
+let greetIdx = 0;
+let stars = 0;
+let feelingChosen = false;
+
+// ─── SCREENS ─────────────────────────────────────────────────────────────────
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-' + id).classList.add('active');
+}
+
+function startLesson() {
+  showScreen('main');
+  setSection('hello');
+  renderFeelings();
+  renderGoodbyes();
+  renderStars();
+}
+
+// ─── SECTIONS ────────────────────────────────────────────────────────────────
+function setSection(sec) {
+  ['hello','feeling','bye'].forEach(s => {
+    const el = document.getElementById('sec-' + s);
+    el.style.display = 'none';
+  });
+
+  // Update tab highlights
+  document.getElementById('tab-hello').className   = 'tab-btn' + (sec==='hello'   ? ' active-hello'   : '');
+  document.getElementById('tab-feeling').className = 'tab-btn' + (sec==='feeling' ? ' active-feeling' : '');
+  document.getElementById('tab-bye').className     = 'tab-btn' + (sec==='bye'     ? ' active-bye'     : '');
+
+  // Toggle night stars for goodbye
+  ['star1','star2','star3'].forEach(id => {
+    document.getElementById(id).classList.toggle('show', sec === 'bye');
+  });
+
+  if (sec === 'hello') {
+    document.getElementById('sec-hello').style.display = 'block';
+    updateGreetCard();
+  } else if (sec === 'feeling') {
+    const el = document.getElementById('sec-feeling');
+    el.style.display = 'flex';
+  } else if (sec === 'bye') {
+    const el = document.getElementById('sec-bye');
+    el.style.display = 'flex';
+  }
+}
+
+// ─── GREETINGS ───────────────────────────────────────────────────────────────
+function updateGreetCard() {
+  const g = greetings[greetIdx];
+  document.getElementById('hello-emoji').textContent = g.emoji;
+  document.getElementById('hello-word').textContent  = g.word;
+  document.getElementById('hello-sub').textContent   = g.sub;
+  animateCard('hello-card');
+}
+
+function nextGreeting() {
+  if (greetIdx < greetings.length - 1) {
+    greetIdx++;
+    updateGreetCard();
+  } else {
+    // Move to feelings
+    addStar();
+    setSection('feeling');
+  }
+}
+
+function prevGreeting() {
+  if (greetIdx > 0) { greetIdx--; updateGreetCard(); }
+}
+
+function tapGreeting() {
+  const g = greetings[greetIdx];
+  showFeedback(g.emoji);
+  const el = document.getElementById('hello-emoji');
+  el.style.transform = 'scale(1.3) rotate(-10deg)';
+  setTimeout(() => { el.style.transform = ''; }, 280);
+}
+
+function animateCard(id) {
+  const c = document.getElementById(id);
+  if (!c) return;
+  c.style.animation = 'none';
+  setTimeout(() => { c.style.animation = 'slideIn 0.4s ease'; }, 10);
+}
+
+// ─── FEELINGS ────────────────────────────────────────────────────────────────
+function renderFeelings() {
+  const grid = document.getElementById('feelings-grid');
+  grid.innerHTML = '';
+  feelings.forEach(f => {
+    const btn = document.createElement('button');
+    btn.className = 'feeling-btn';
+    btn.innerHTML = `<span class="feeling-emoji">${f.emoji}</span><span class="feeling-word">${f.word}</span>`;
+    btn.onclick = () => chooseFeel(btn, f);
+    grid.appendChild(btn);
+  });
+}
+
+function chooseFeel(btn, f) {
+  // Clear previous selection
+  document.querySelectorAll('.feeling-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+
+  const bubble = document.getElementById('response-bubble');
+  bubble.textContent = f.response;
+  bubble.classList.add('show');
+
+  const nextBtn = document.getElementById('next-bye-btn');
+  nextBtn.classList.add('show');
+
+  showFeedback(f.emoji);
+  if (!feelingChosen) { addStar(); feelingChosen = true; }
+}
+
+// ─── GOODBYES ────────────────────────────────────────────────────────────────
+function renderGoodbyes() {
+  const grid = document.getElementById('bye-grid');
+  grid.innerHTML = '';
+  goodbyes.forEach((b, i) => {
+    const card = document.createElement('div');
+    card.className = 'bye-card';
+    card.style.animationDelay = (i * 0.08) + 's';
+    card.innerHTML = `
+      <span class="bye-emoji">${b.emoji}</span>
+      <div class="bye-text">
+        <div class="bye-word">${b.word}</div>
+        <div class="bye-sub">${b.sub}</div>
+      </div>
+    `;
+    card.onclick = () => {
+      document.querySelectorAll('.bye-card').forEach(c => c.classList.remove('tapped'));
+      card.classList.add('tapped');
+      showFeedback(b.emoji);
+      if (b.word === 'GOOD JOB TODAY!') {
+        setTimeout(() => { addStar(); showScreen('win'); renderWinStars(); }, 900);
+      }
+    };
+    grid.appendChild(card);
+  });
+}
+
+// ─── STARS ───────────────────────────────────────────────────────────────────
+function addStar() {
+  stars++;
+  renderStars();
+}
+function renderStars() {
+  const bar = document.getElementById('star-bar');
+  if (!bar) return;
+  bar.innerHTML = '';
+  for (let i = 0; i < stars; i++) {
+    const s = document.createElement('span');
+    s.textContent = '⭐';
+    bar.appendChild(s);
+  }
+}
+function renderWinStars() {
+  document.getElementById('win-stars').textContent = '⭐'.repeat(Math.max(stars, 1));
+}
+
+// ─── FEEDBACK ────────────────────────────────────────────────────────────────
+function showFeedback(emoji) {
+  const el = document.getElementById('feedback');
+  el.textContent = emoji;
+  el.style.display = 'block';
+  el.style.animation = 'none';
+  setTimeout(() => { el.style.animation = 'feedbackPop 1s ease forwards'; }, 10);
+  setTimeout(() => { el.style.display = 'none'; }, 1050);
+}
+
+// ─── RESTART ─────────────────────────────────────────────────────────────────
+function restart() {
+  stars = 0; greetIdx = 0; feelingChosen = false;
+  document.getElementById('response-bubble').classList.remove('show');
+  document.getElementById('next-bye-btn').classList.remove('show');
+  document.querySelectorAll('.feeling-btn').forEach(b => b.classList.remove('selected'));
+  renderStars();
+  showScreen('main');
+  setSection('hello');
+}
+</script>
+</body>
+</html>

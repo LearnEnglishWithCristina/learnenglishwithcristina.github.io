@@ -1,0 +1,783 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Food Homework! 🍎</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;700;900&display=swap');
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg1: #FFF3E0;
+    --bg2: #FFE0B2;
+    --a1:  #E64A19;
+    --a2:  #1565C0;
+    --a3:  #2E7D32;
+    --like-color: #1565C0;
+    --dontlike-color: #E64A19;
+    --correct: #43A047;
+    --wrong:   #E53935;
+    --card: #ffffff;
+    --text: #2c2c2c;
+  }
+
+  body {
+    font-family: 'Nunito', sans-serif;
+    min-height: 100vh;
+    background: linear-gradient(160deg, var(--bg1) 0%, var(--bg2) 100%);
+    display: flex; flex-direction: column; align-items: center;
+    padding: 10px 10px 50px;
+    overflow-x: hidden;
+  }
+
+  .floatie {
+    position: fixed; font-size: 34px; opacity: 0.08;
+    pointer-events: none; animation: floatUp linear infinite;
+  }
+  .floatie:nth-child(1){left:4%;  animation-duration:13s; animation-delay:0s;}
+  .floatie:nth-child(2){left:22%; animation-duration:19s; animation-delay:-6s;}
+  .floatie:nth-child(3){left:60%; animation-duration:11s; animation-delay:-4s;}
+  .floatie:nth-child(4){left:82%; animation-duration:17s; animation-delay:-9s;}
+  @keyframes floatUp { from{transform:translateY(110vh)} to{transform:translateY(-10vh)} }
+
+  .screen { display:none; width:100%; max-width:720px; flex-direction:column; align-items:center; }
+  .screen.active { display:flex; }
+
+  /* ── HOME ── */
+  .home-box {
+    background: var(--card); border-radius: 32px;
+    padding: 36px 44px; text-align: center;
+    box-shadow: 0 10px 40px rgba(230,74,25,0.18);
+    margin-top: 50px; animation: bounceIn 0.6s ease;
+  }
+  @keyframes bounceIn{0%{transform:scale(0.5);opacity:0}70%{transform:scale(1.05)}100%{transform:scale(1);opacity:1}}
+  .home-title { font-family:'Fredoka One',sans-serif; font-size:50px; color:var(--a1); }
+  .home-sub   { font-size:17px; color:#aaa; margin:6px 0 24px; }
+
+  .activity-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:14px; width:100%; }
+  @media(max-width:480px){ .activity-grid{ grid-template-columns:1fr; } }
+
+  .act-card {
+    background:#fff; border-radius:22px; padding:22px 12px; text-align:center;
+    box-shadow:0 5px 18px rgba(0,0,0,0.09); cursor:pointer;
+    border:3px solid transparent; transition:all 0.2s;
+  }
+  .act-card:hover { transform:scale(1.05); }
+  .act-card.act1:hover { border-color:var(--a1); }
+  .act-card.act2:hover { border-color:var(--a2); }
+  .act-card.act3:hover { border-color:var(--a3); }
+  .act-icon  { font-size:50px; display:block; margin-bottom:8px; }
+  .act-label { font-family:'Fredoka One',sans-serif; font-size:17px; color:var(--text); }
+  .act-stars { font-size:15px; margin-top:5px; min-height:20px; }
+
+  /* ── SHARED HEADER ── */
+  .lesson-header {
+    background:rgba(0,0,0,0.7); color:#fff; border-radius:50px;
+    padding:8px 20px; display:flex; gap:10px; align-items:center;
+    margin-bottom:12px; flex-wrap:wrap; justify-content:center; font-size:13px;
+  }
+  .back-btn {
+    background:rgba(255,255,255,0.2); border:1px solid rgba(255,255,255,0.35);
+    color:#fff; border-radius:20px; padding:4px 14px;
+    font-family:'Nunito',sans-serif; font-size:13px; font-weight:700; cursor:pointer;
+  }
+  .back-btn:hover { background:rgba(255,255,255,0.35); }
+
+  .act-title-bar {
+    font-family:'Fredoka One',sans-serif; font-size:22px;
+    border-radius:50px; padding:8px 26px; color:#fff; margin-bottom:14px; text-align:center;
+  }
+  .bar-orange { background:var(--a1); }
+  .bar-blue   { background:var(--a2); }
+  .bar-green  { background:var(--a3); }
+
+  .star-row { display:flex; gap:6px; font-size:24px; margin-bottom:10px; min-height:30px; flex-wrap:wrap; justify-content:center; }
+
+  /* ── ACTIVITY 1: HIDE & REVEAL ── */
+  .reveal-grid {
+    display:grid; grid-template-columns:repeat(4,1fr);
+    gap:12px; width:100%; max-width:580px;
+  }
+  @media(max-width:440px){ .reveal-grid{ grid-template-columns:repeat(2,1fr); } }
+
+  .reveal-card {
+    background: var(--card); border-radius:20px;
+    aspect-ratio:1; display:flex; flex-direction:column;
+    align-items:center; justify-content:center;
+    box-shadow:0 4px 14px rgba(0,0,0,0.1);
+    cursor:pointer; transition:all 0.3s; position:relative;
+    overflow:hidden; border:3px solid #f0e0d0;
+  }
+  .reveal-card .cover {
+    position:absolute; inset:0;
+    background: linear-gradient(135deg, var(--a1), #FF8A65);
+    display:flex; align-items:center; justify-content:center;
+    font-size:36px; border-radius:17px;
+    transition: all 0.4s ease;
+  }
+  .reveal-card.revealed .cover { opacity:0; pointer-events:none; transform:scale(1.1); }
+  .reveal-card .food-emoji { font-size:52px; }
+  .reveal-card .food-label {
+    font-family:'Fredoka One',sans-serif; font-size:13px;
+    color:var(--text); margin-top:4px;
+  }
+  .reveal-card.revealed { border-color:var(--correct); }
+  .reveal-card:hover .cover { transform:scale(0.95); }
+
+  .reveal-info { font-size:15px; color:#888; font-weight:700; margin-bottom:10px; text-align:center; }
+  .reveal-next-btn {
+    display:none; margin-top:14px;
+    background:var(--a1); color:#fff; border:none; border-radius:50px;
+    padding:12px 32px; font-family:'Fredoka One',sans-serif; font-size:20px;
+    cursor:pointer; box-shadow:0 5px 0 #BF360C; transition:all 0.15s;
+  }
+  .reveal-next-btn.show { display:inline-block; }
+  .reveal-next-btn:hover  { transform:translateY(-2px); box-shadow:0 7px 0 #BF360C; }
+  .reveal-next-btn:active { transform:translateY(2px);  box-shadow:0 3px 0 #BF360C; }
+
+  /* ── ACTIVITY 2: SENTENCE BUILDER ── */
+  .sentence-stage {
+    background:var(--card); border-radius:28px; padding:24px 20px;
+    box-shadow:0 8px 28px rgba(0,0,0,0.11);
+    width:100%; max-width:580px; text-align:center;
+  }
+
+  .sentence-display {
+    font-family:'Fredoka One',sans-serif; font-size:28px;
+    min-height:60px; background:#f0f4ff; border-radius:16px;
+    padding:14px 18px; margin-bottom:18px; color:var(--a2);
+    border:3px solid #c5cae9; transition:all 0.3s;
+    display:flex; align-items:center; justify-content:center; flex-wrap:wrap; gap:8px;
+  }
+  .sentence-display.dont { color:var(--a1); background:#fff3f0; border-color:#ffccbc; }
+
+  .sentence-toggle {
+    display:flex; gap:10px; justify-content:center; margin-bottom:18px;
+  }
+  .toggle-btn {
+    background:#f5f5f5; border:3px solid #e0e0e0; border-radius:50px;
+    padding:10px 22px; font-family:'Fredoka One',sans-serif; font-size:17px;
+    cursor:pointer; transition:all 0.2s; color:var(--text);
+  }
+  .toggle-btn.like-active    { background:#e8eaf6; border-color:var(--a2); color:var(--a2); }
+  .toggle-btn.dontlike-active{ background:#fbe9e7; border-color:var(--a1); color:var(--a1); }
+
+  .food-tap-grid {
+    display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-bottom:16px;
+  }
+  @media(max-width:440px){ .food-tap-grid{ grid-template-columns:repeat(2,1fr); } }
+
+  .food-tap-btn {
+    background:#fafafa; border:3px solid #ececec; border-radius:16px;
+    padding:12px 6px; font-size:40px; cursor:pointer; transition:all 0.2s;
+    display:flex; flex-direction:column; align-items:center; gap:4px;
+  }
+  .food-tap-btn:hover    { transform:scale(1.08); border-color:var(--a2); }
+  .food-tap-btn.selected { background:#e8eaf6; border-color:var(--a2); animation:correctBounce 0.4s ease; }
+  .food-tap-btn.selected.dont { background:#fbe9e7; border-color:var(--a1); }
+  .food-tap-btn .tap-label { font-size:11px; font-weight:900; color:#aaa; }
+
+  .sentence-speak-btn {
+    background:var(--a2); color:#fff; border:none; border-radius:50px;
+    padding:12px 28px; font-family:'Fredoka One',sans-serif; font-size:18px;
+    cursor:pointer; box-shadow:0 5px 0 #0D47A1; transition:all 0.15s;
+    display:none; margin:0 auto;
+  }
+  .sentence-speak-btn.show { display:block; }
+  .sentence-speak-btn:hover  { transform:translateY(-2px); box-shadow:0 7px 0 #0D47A1; }
+  .sentence-speak-btn:active { transform:translateY(2px);  box-shadow:0 3px 0 #0D47A1; }
+  .sentence-speak-btn.dont { background:var(--a1); box-shadow:0 5px 0 #BF360C; }
+  .sentence-speak-btn.dont:hover { box-shadow:0 7px 0 #BF360C; }
+
+  /* ── ACTIVITY 3: DRAG TO BUCKETS ── */
+  .buckets-wrap {
+    width:100%; max-width:580px;
+  }
+  .buckets-row {
+    display:grid; grid-template-columns:1fr 1fr; gap:14px;
+    margin-bottom:16px;
+  }
+  .bucket {
+    background:var(--card); border-radius:22px; padding:14px 10px;
+    text-align:center; min-height:140px;
+    border:4px dashed #ccc; transition:all 0.2s;
+    position:relative;
+  }
+  .bucket.like-bucket    { border-color:#90CAF9; background:#E3F2FD; }
+  .bucket.dontlike-bucket{ border-color:#FFAB91; background:#FBE9E7; }
+  .bucket.drag-over      { transform:scale(1.03); border-style:solid; }
+  .bucket.like-bucket.drag-over    { border-color:var(--a2); background:#BBDEFB; }
+  .bucket.dontlike-bucket.drag-over{ border-color:var(--a1); background:#FFCCBC; }
+
+  .bucket-label {
+    font-family:'Fredoka One',sans-serif; font-size:16px; margin-bottom:8px;
+  }
+  .like-bucket .bucket-label    { color:var(--a2); }
+  .dontlike-bucket .bucket-label{ color:var(--a1); }
+
+  .bucket-items {
+    display:flex; flex-wrap:wrap; gap:6px; justify-content:center; min-height:50px;
+  }
+  .bucket-item { font-size:28px; }
+
+  .drag-tray {
+    display:flex; flex-wrap:wrap; gap:12px;
+    justify-content:center; margin-top:6px;
+  }
+  .drag-item {
+    background:#fff; border:3px solid #ffd0a0; border-radius:16px;
+    padding:10px 12px; font-size:38px; cursor:grab;
+    transition:all 0.15s; user-select:none; touch-action:none;
+    display:flex; flex-direction:column; align-items:center; gap:3px;
+  }
+  .drag-item:hover  { transform:scale(1.1); border-color:var(--a1); }
+  .drag-item.used   { opacity:0.2; pointer-events:none; }
+  .drag-item .drag-label { font-size:10px; font-weight:900; color:#aaa; }
+
+  #dragGhost {
+    position:fixed; pointer-events:none; z-index:9999;
+    font-size:48px; display:none; transform:translate(-50%,-50%);
+  }
+
+  .bucket-next-btn {
+    display:none; margin:14px auto 0;
+    background:var(--a3); color:#fff; border:none; border-radius:50px;
+    padding:12px 30px; font-family:'Fredoka One',sans-serif; font-size:19px;
+    cursor:pointer; box-shadow:0 5px 0 #1B5E20; transition:all 0.15s;
+  }
+  .bucket-next-btn.show { display:block; }
+  .bucket-next-btn:hover  { transform:translateY(-2px); box-shadow:0 7px 0 #1B5E20; }
+  .bucket-next-btn:active { transform:translateY(2px);  box-shadow:0 3px 0 #1B5E20; }
+
+  /* ── WIN ── */
+  .win-box {
+    background:var(--card); border-radius:30px; padding:44px;
+    text-align:center; box-shadow:0 10px 40px rgba(0,0,0,0.18);
+    max-width:460px; animation:bounceIn 0.6s ease;
+  }
+  .win-emoji { font-size:80px; display:block; }
+  .win-title { font-family:'Fredoka One',sans-serif; font-size:44px; color:var(--a1); margin:12px 0; }
+  .win-stars { font-size:36px; margin:8px 0; }
+  .win-sub   { font-size:17px; color:#888; }
+  .big-btn {
+    margin-top:24px; background:var(--a1); color:#fff;
+    border:none; border-radius:50px; padding:15px 44px;
+    font-size:22px; font-family:'Fredoka One',sans-serif;
+    cursor:pointer; box-shadow:0 6px 0 #BF360C; transition:all 0.15s;
+  }
+  .big-btn:hover  { transform:translateY(-3px); box-shadow:0 9px 0 #BF360C; }
+  .big-btn:active { transform:translateY(3px);  box-shadow:0 3px 0 #BF360C; }
+
+  /* ── FEEDBACK ── */
+  .feedback {
+    position:fixed; top:50%; left:50%; transform:translate(-50%,-50%);
+    font-size:90px; pointer-events:none; z-index:9998; display:none;
+    animation:feedbackPop 1s ease forwards;
+  }
+  @keyframes feedbackPop{0%{transform:translate(-50%,-50%) scale(0);opacity:1}50%{transform:translate(-50%,-62%) scale(1.2);opacity:1}100%{transform:translate(-50%,-82%) scale(0.9);opacity:0}}
+  @keyframes correctBounce{0%{transform:scale(1)}40%{transform:scale(1.2)}70%{transform:scale(0.96)}100%{transform:scale(1)}}
+  @keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-10px)}40%{transform:translateX(10px)}60%{transform:translateX(-8px)}80%{transform:translateX(5px)}}
+</style>
+</head>
+<body>
+
+<div class="floatie">🍎</div>
+<div class="floatie">🍕</div>
+<div class="floatie">🍦</div>
+<div class="floatie">🥕</div>
+<div id="dragGhost"></div>
+<div class="feedback" id="feedback"></div>
+
+<!-- sound toggle -->
+<button id="sound-toggle" onclick="toggleSound()"
+  style="position:fixed;top:14px;left:18px;z-index:999;background:rgba(255,255,255,0.85);
+  border:2px solid #ccc;border-radius:50%;width:48px;height:48px;font-size:24px;
+  cursor:pointer;box-shadow:0 3px 10px rgba(0,0,0,0.15);">🔊</button>
+
+<!-- ══════════ HOME ══════════ -->
+<div class="screen active" id="screen-home">
+  <div class="home-box">
+    <div class="home-title">🍽️ Food Homework!</div>
+    <div class="home-sub">3 fun activities 🌟</div>
+    <div class="activity-grid">
+      <div class="act-card act1" onclick="startActivity(1)">
+        <span class="act-icon">🙈</span>
+        <div class="act-label">What's hiding?</div>
+        <div class="act-stars" id="home-stars-1"></div>
+      </div>
+      <div class="act-card act2" onclick="startActivity(2)">
+        <span class="act-icon">💬</span>
+        <div class="act-label">I like...</div>
+        <div class="act-stars" id="home-stars-2"></div>
+      </div>
+      <div class="act-card act3" onclick="startActivity(3)">
+        <span class="act-icon">🗂️</span>
+        <div class="act-label">Sort it!</div>
+        <div class="act-stars" id="home-stars-3"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ ACT 1: HIDE & REVEAL ══════════ -->
+<div class="screen" id="screen-act1">
+  <div class="lesson-header">
+    <button class="back-btn" onclick="goHome()">🏠 Home</button>
+    <span>🙈 What's hiding?</span>
+  </div>
+  <div class="act-title-bar bar-orange">👆 Tap to reveal the food!</div>
+  <div class="star-row" id="reveal-stars"></div>
+  <div class="reveal-info" id="reveal-info">Tap all the cards to reveal the food!</div>
+  <div class="reveal-grid" id="reveal-grid"></div>
+  <button class="reveal-next-btn" id="reveal-next-btn" onclick="nextRevealRound()">Again! 🔄</button>
+</div>
+
+<!-- ══════════ ACT 2: SENTENCE BUILDER ══════════ -->
+<div class="screen" id="screen-act2">
+  <div class="lesson-header">
+    <button class="back-btn" onclick="goHome()">🏠 Home</button>
+    <span>💬 I like...</span>
+  </div>
+  <div class="act-title-bar bar-blue">Tap a food to make a sentence!</div>
+  <div class="star-row" id="sentence-stars"></div>
+
+  <div class="sentence-stage">
+    <div class="sentence-toggle">
+      <button class="toggle-btn like-active" id="toggle-like" onclick="setSentenceMode('like')">😋 I like...</button>
+      <button class="toggle-btn" id="toggle-dontlike" onclick="setSentenceMode('dontlike')">🙅 I don't like...</button>
+    </div>
+    <div class="sentence-display" id="sentence-display">Tap a food! 👇</div>
+    <div class="food-tap-grid" id="food-tap-grid"></div>
+    <button class="sentence-speak-btn" id="sentence-speak-btn" onclick="speakSentence()">🔊 Say it!</button>
+  </div>
+</div>
+
+<!-- ══════════ ACT 3: DRAG TO BUCKETS ══════════ -->
+<div class="screen" id="screen-act3">
+  <div class="lesson-header">
+    <button class="back-btn" onclick="goHome()">🏠 Home</button>
+    <span>🗂️ Sort it!</span>
+  </div>
+  <div class="act-title-bar bar-green">Drag the food into the right bucket!</div>
+  <div class="star-row" id="bucket-stars"></div>
+
+  <div class="buckets-wrap">
+    <div class="buckets-row">
+      <div class="bucket like-bucket" id="bucket-like">
+        <div class="bucket-label">😋 I like</div>
+        <div class="bucket-items" id="bucket-like-items"></div>
+      </div>
+      <div class="bucket dontlike-bucket" id="bucket-dontlike">
+        <div class="bucket-label">🙅 I don't like</div>
+        <div class="bucket-items" id="bucket-dontlike-items"></div>
+      </div>
+    </div>
+    <div class="drag-tray" id="drag-tray"></div>
+    <button class="bucket-next-btn" id="bucket-next-btn" onclick="nextBucketRound()">Next ➡ 🌟</button>
+  </div>
+</div>
+
+<!-- ══════════ WIN ══════════ -->
+<div class="screen" id="screen-win">
+  <div class="win-box">
+    <span class="win-emoji">🎉</span>
+    <div class="win-title">Amazing!</div>
+    <div class="win-stars" id="win-stars">⭐⭐⭐</div>
+    <div class="win-sub">Show your teacher next class! 👩‍🏫</div>
+    <button class="big-btn" onclick="goHome()">🏠 Play Again</button>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════
+// DATA
+// ═══════════════════════════════════════════════════
+const foods = [
+  { emoji:'🍎', name:'Apple'    },
+  { emoji:'🍌', name:'Banana'   },
+  { emoji:'🍕', name:'Pizza'    },
+  { emoji:'🍚', name:'Rice'     },
+  { emoji:'🥚', name:'Egg'      },
+  { emoji:'🍦', name:'Ice Cream'},
+  { emoji:'🍪', name:'Cookie'   },
+  { emoji:'🥕', name:'Carrot'   },
+];
+
+// ═══════════════════════════════════════════════════
+// TTS
+// ═══════════════════════════════════════════════════
+let ttsReady=false, soundOn=true, ttsVoice=null;
+
+function unlockTTS(){
+  if(ttsReady)return; ttsReady=true;
+  const u=new SpeechSynthesisUtterance(' '); u.volume=0;
+  window.speechSynthesis.speak(u); pickVoice();
+}
+function pickVoice(){
+  const v=window.speechSynthesis.getVoices();
+  ttsVoice=v.find(x=>x.lang==='en-US'&&x.localService)||
+           v.find(x=>x.lang==='en-US')||
+           v.find(x=>x.lang.startsWith('en-')&&x.localService)||
+           v.find(x=>x.lang.startsWith('en'))||v[0]||null;
+}
+if(window.speechSynthesis){ window.speechSynthesis.onvoiceschanged=pickVoice; pickVoice(); }
+
+function speak(text, rate=0.78){
+  if(!soundOn||!window.speechSynthesis)return;
+  window.speechSynthesis.cancel();
+  const u=new SpeechSynthesisUtterance(text);
+  u.rate=rate; u.pitch=1.05; u.volume=1;
+  if(ttsVoice)u.voice=ttsVoice;
+  window.speechSynthesis.speak(u);
+}
+function toggleSound(){
+  soundOn=!soundOn;
+  document.getElementById('sound-toggle').textContent=soundOn?'🔊':'🔇';
+}
+document.addEventListener('touchstart',unlockTTS,{once:true});
+document.addEventListener('mousedown', unlockTTS,{once:true});
+
+// ═══════════════════════════════════════════════════
+// SCREENS
+// ═══════════════════════════════════════════════════
+const actStars={1:0,2:0,3:0};
+
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('screen-'+id).classList.add('active');
+}
+function goHome(){
+  updateHomeStars();
+  showScreen('home');
+}
+function startActivity(n){
+  if(n===1){ showScreen('act1'); initReveal(); }
+  if(n===2){ showScreen('act2'); initSentence(); }
+  if(n===3){ showScreen('act3'); initBuckets(); }
+}
+function updateHomeStars(){
+  [1,2,3].forEach(n=>{
+    document.getElementById('home-stars-'+n).textContent='⭐'.repeat(actStars[n]);
+  });
+}
+function showFeedback(emoji){
+  const el=document.getElementById('feedback');
+  el.textContent=emoji; el.style.display='block'; el.style.animation='none';
+  setTimeout(()=>{ el.style.animation='feedbackPop 1s ease forwards'; },10);
+  setTimeout(()=>{ el.style.display='none'; },1050);
+}
+function shuffle(arr){
+  const a=[...arr];
+  for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}
+  return a;
+}
+
+// ═══════════════════════════════════════════════════
+// ACTIVITY 1 — HIDE & REVEAL
+// ═══════════════════════════════════════════════════
+let revealCount=0, revealStars=0, revealTotal=8;
+
+function initReveal(){
+  revealCount=0; revealStars=0;
+  document.getElementById('reveal-next-btn').classList.remove('show');
+  document.getElementById('reveal-info').textContent='Tap all the cards to reveal the food!';
+  renderRevealGrid();
+}
+
+function renderRevealGrid(){
+  revealCount=0;
+  const shuffled=shuffle(foods);
+  const grid=document.getElementById('reveal-grid');
+  grid.innerHTML='';
+  shuffled.forEach((food,i)=>{
+    const card=document.createElement('div');
+    card.className='reveal-card';
+    card.innerHTML=`
+      <div class="cover">❓</div>
+      <span class="food-emoji">${food.emoji}</span>
+      <div class="food-label">${food.name.toUpperCase()}</div>
+    `;
+    card.style.animationDelay=(i*0.05)+'s';
+    card.onclick=()=>revealCard(card, food);
+    grid.appendChild(card);
+  });
+  document.getElementById('reveal-stars').innerHTML='⭐'.repeat(actStars[1]);
+}
+
+function revealCard(card, food){
+  if(card.classList.contains('revealed'))return;
+  card.classList.add('revealed');
+  speak(food.name, 0.75);
+  showFeedback(food.emoji);
+  revealCount++;
+  revealStars=Math.min(3,revealStars+1);
+  actStars[1]=Math.min(3,Math.round(revealCount/8*3));
+  document.getElementById('reveal-stars').innerHTML='⭐'.repeat(actStars[1]);
+  if(revealCount===8){
+    document.getElementById('reveal-info').textContent='🎉 Great job! You found them all!';
+    speak('Great job! You found them all!');
+    showFeedback('🎉');
+    document.getElementById('reveal-next-btn').classList.add('show');
+  }
+}
+
+function nextRevealRound(){
+  renderRevealGrid();
+  document.getElementById('reveal-next-btn').classList.remove('show');
+  document.getElementById('reveal-info').textContent='Tap all the cards to reveal the food!';
+}
+
+// ═══════════════════════════════════════════════════
+// ACTIVITY 2 — SENTENCE BUILDER
+// ═══════════════════════════════════════════════════
+let sentenceMode='like';
+let selectedFood=null;
+let sentenceStars=0;
+let sentenceTapped=new Set();
+
+function initSentence(){
+  sentenceMode='like'; selectedFood=null;
+  sentenceTapped=new Set(); sentenceStars=0;
+  setSentenceMode('like');
+  renderFoodTapGrid();
+  document.getElementById('sentence-display').textContent='Tap a food! 👇';
+  document.getElementById('sentence-display').className='sentence-display';
+  document.getElementById('sentence-speak-btn').className='sentence-speak-btn';
+  document.getElementById('sentence-stars').innerHTML='';
+}
+
+function setSentenceMode(mode){
+  sentenceMode=mode;
+  selectedFood=null;
+  document.getElementById('sentence-display').textContent='Tap a food! 👇';
+  document.getElementById('sentence-display').className='sentence-display'+(mode==='dontlike'?' dont':'');
+  document.getElementById('sentence-speak-btn').className='sentence-speak-btn'+(mode==='dontlike'?' dont':'');
+  document.getElementById('sentence-speak-btn').classList.remove('show');
+
+  document.getElementById('toggle-like').className='toggle-btn'+(mode==='like'?' like-active':'');
+  document.getElementById('toggle-dontlike').className='toggle-btn'+(mode==='dontlike'?' dontlike-active':'');
+
+  // Update food button selected state
+  document.querySelectorAll('.food-tap-btn').forEach(b=>{
+    b.className='food-tap-btn'+(mode==='dontlike'?' dont':'');
+  });
+}
+
+function renderFoodTapGrid(){
+  const grid=document.getElementById('food-tap-grid');
+  grid.innerHTML='';
+  foods.forEach(food=>{
+    const btn=document.createElement('button');
+    btn.className='food-tap-btn';
+    btn.innerHTML=`${food.emoji}<span class="tap-label">${food.name.toUpperCase()}</span>`;
+    btn.onclick=()=>tapFood(btn, food);
+    grid.appendChild(btn);
+  });
+}
+
+function tapFood(btn, food){
+  selectedFood=food;
+
+  // Clear previous selection
+  document.querySelectorAll('.food-tap-btn').forEach(b=>{
+    b.classList.remove('selected');
+  });
+  btn.classList.add('selected');
+  if(sentenceMode==='dontlike') btn.classList.add('dont');
+
+  const sentence = sentenceMode==='like'
+    ? `I like ${food.name}!`
+    : `I don't like ${food.name}!`;
+
+  const display=document.getElementById('sentence-display');
+  display.textContent=sentence;
+  display.className='sentence-display'+(sentenceMode==='dontlike'?' dont':'');
+
+  const speakBtn=document.getElementById('sentence-speak-btn');
+  speakBtn.className='sentence-speak-btn show'+(sentenceMode==='dontlike'?' dont':'');
+
+  // Award star for new food tried
+  const key=sentenceMode+food.name;
+  if(!sentenceTapped.has(key)){
+    sentenceTapped.add(key);
+    sentenceStars=Math.min(3,Math.floor(sentenceTapped.size/4));
+    actStars[2]=sentenceStars;
+    document.getElementById('sentence-stars').innerHTML='⭐'.repeat(sentenceStars);
+  }
+
+  // Auto speak
+  speak(sentence, 0.78);
+  showFeedback(food.emoji);
+}
+
+function speakSentence(){
+  if(!selectedFood)return;
+  const sentence = sentenceMode==='like'
+    ? `I like ${selectedFood.name}!`
+    : `I don't like ${selectedFood.name}!`;
+  speak(sentence, 0.75);
+}
+
+// ═══════════════════════════════════════════════════
+// ACTIVITY 3 — DRAG TO BUCKETS
+// ═══════════════════════════════════════════════════
+let bucketRound=0, bucketStars=0;
+let bucketDragItem=null;
+let bucketPlaced=0;
+
+function initBuckets(){
+  bucketRound=0; bucketStars=0;
+  renderBucketRound();
+}
+
+function renderBucketRound(){
+  bucketPlaced=0;
+  document.getElementById('bucket-next-btn').classList.remove('show');
+  document.getElementById('bucket-like-items').innerHTML='';
+  document.getElementById('bucket-dontlike-items').innerHTML='';
+  document.getElementById('bucket-like').classList.remove('drag-over');
+  document.getElementById('bucket-dontlike').classList.remove('drag-over');
+
+  // Pick 4 random foods this round
+  const roundFoods=shuffle(foods).slice(0,4);
+  const tray=document.getElementById('drag-tray');
+  tray.innerHTML='';
+
+  roundFoods.forEach(food=>{
+    const el=document.createElement('div');
+    el.className='drag-item';
+    el.innerHTML=`${food.emoji}<span class="drag-label">${food.name.toUpperCase()}</span>`;
+    el.dataset.name=food.name;
+    el.dataset.emoji=food.emoji;
+    el.draggable=true;
+
+    // Desktop drag
+    el.addEventListener('dragstart',(e)=>{
+      bucketDragItem={emoji:food.emoji, name:food.name, el};
+      e.dataTransfer.effectAllowed='move';
+      e.dataTransfer.setData('text/plain', food.name);
+      setTimeout(()=>el.style.opacity='0.4',0);
+    });
+    el.addEventListener('dragend',()=>{ el.style.opacity='1'; });
+
+    // Touch drag
+    el.addEventListener('touchstart',(e)=>{
+      e.preventDefault();
+      bucketDragItem={emoji:food.emoji, name:food.name, el};
+      const ghost=document.getElementById('dragGhost');
+      ghost.textContent=food.emoji;
+      ghost.style.display='block';
+      moveTouchGhost(e.touches[0]);
+    },{passive:false});
+    el.addEventListener('touchmove',(e)=>{
+      e.preventDefault();
+      moveTouchGhost(e.touches[0]);
+    },{passive:false});
+    el.addEventListener('touchend',(e)=>{
+      e.preventDefault();
+      document.getElementById('dragGhost').style.display='none';
+      const t=e.changedTouches[0];
+      const target=document.elementFromPoint(t.clientX, t.clientY);
+      const bucket=target?target.closest('.bucket'):null;
+      if(bucket){
+        const bucketType=bucket.classList.contains('like-bucket')?'like':'dontlike';
+        dropIntoBucket(bucketType);
+      }
+      bucketDragItem=null;
+    },{passive:false});
+
+    tray.appendChild(el);
+  });
+
+  document.getElementById('bucket-stars').innerHTML='⭐'.repeat(actStars[3]);
+}
+
+function moveTouchGhost(touch){
+  const ghost=document.getElementById('dragGhost');
+  ghost.style.left=touch.clientX+'px';
+  ghost.style.top=touch.clientY+'px';
+}
+
+function handleBucketDrop(e, bucketType){
+  e.preventDefault();
+  document.getElementById('bucket-'+bucketType).classList.remove('drag-over');
+  if(!bucketDragItem)return;
+  dropIntoBucket(bucketType);
+  bucketDragItem=null;
+}
+
+function dropIntoBucket(bucketType){
+  if(!bucketDragItem)return;
+  const food=bucketDragItem;
+
+  // Any bucket is "correct" — this is a preference activity, not right/wrong!
+  const itemsEl=document.getElementById('bucket-'+bucketType+'-items');
+  const span=document.createElement('span');
+  span.className='bucket-item';
+  span.textContent=food.emoji;
+  span.title=food.name;
+  itemsEl.appendChild(span);
+
+  food.el.classList.add('used');
+  showFeedback(food.emoji);
+
+  const sentence=bucketType==='like'
+    ? `I like ${food.name}!`
+    : `I don't like ${food.name}!`;
+  speak(sentence, 0.78);
+
+  bucketPlaced++;
+  bucketStars=Math.min(3, bucketPlaced);
+  actStars[3]=Math.min(3,Math.round(bucketPlaced/4*3));
+  document.getElementById('bucket-stars').innerHTML='⭐'.repeat(actStars[3]);
+
+  if(bucketPlaced>=4){
+    document.getElementById('bucket-next-btn').classList.add('show');
+    speak('Great job!');
+    showFeedback('🎉');
+  }
+}
+
+function nextBucketRound(){
+  if(bucketRound<1){
+    bucketRound++;
+    renderBucketRound();
+  } else {
+    updateHomeStars();
+    showFeedback('🎉');
+    speak('Amazing! You finished!');
+    setTimeout(()=>{ showScreen('win'); document.getElementById('win-stars').textContent='⭐'.repeat(Math.max(1,actStars[3])); },1000);
+  }
+}
+
+// ═══════════════════════════════════════════════════
+// BUCKET DROP ZONE LISTENERS — set up once on load
+// ═══════════════════════════════════════════════════
+function setupBucketListeners() {
+  ['like','dontlike'].forEach(type => {
+    const bucket = document.getElementById('bucket-' + type);
+    bucket.addEventListener('dragover', e => {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'move';
+      bucket.classList.add('drag-over');
+    });
+    bucket.addEventListener('dragleave', e => {
+      bucket.classList.remove('drag-over');
+    });
+    bucket.addEventListener('drop', e => {
+      e.preventDefault();
+      bucket.classList.remove('drag-over');
+      handleBucketDrop(e, type);
+    });
+  });
+}
+
+// ═══════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════
+updateHomeStars();
+setupBucketListeners();
+</script>
+</body>
+</html>

@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Animals Part 2! 🦒</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;700;900&display=swap');
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --sky:     #B3E5FC;
+    --land:    #A5D6A7;
+    --ocean:   #4FC3F7;
+    --farm:    #FFB74D;
+    --jungle:  #66BB6A;
+    --highlight:#00796B;
+    --correct: #43A047;
+    --wrong:   #E53935;
+    --card:    #ffffff;
+    --text:    #2c2c2c;
+  }
+
+  body {
+    font-family: 'Nunito', sans-serif;
+    min-height: 100vh;
+    background: linear-gradient(180deg, var(--sky) 0%, #e1f5fe 45%, var(--land) 45%, #81C784 100%);
+    display: flex; flex-direction: column; align-items: center;
+    padding: 10px 10px 50px; overflow-x: hidden;
+  }
+
+  /* Decorations */
+  .sun { position:fixed; top:12px; right:28px; font-size:58px; pointer-events:none; animation:sunPulse 4s ease-in-out infinite; }
+  @keyframes sunPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}
+  .cloud { position:fixed; font-size:44px; opacity:0.75; pointer-events:none; animation:driftCloud linear infinite; }
+  .cloud:nth-child(2){top:20px; animation-duration:24s; animation-delay:0s;}
+  .cloud:nth-child(3){top:65px; font-size:30px; animation-duration:32s; animation-delay:-14s;}
+  @keyframes driftCloud{from{left:-120px}to{left:110%}}
+
+  .screen { display:none; width:100%; max-width:700px; flex-direction:column; align-items:center; }
+  .screen.active { display:flex; }
+
+  /* ── TITLE ── */
+  .title-box {
+    background:var(--card); border-radius:32px; padding:42px 52px;
+    text-align:center; box-shadow:0 10px 40px rgba(0,121,107,0.2);
+    margin-top:55px; animation:bounceIn 0.6s ease;
+  }
+  @keyframes bounceIn{0%{transform:scale(0.5);opacity:0}70%{transform:scale(1.05)}100%{transform:scale(1);opacity:1}}
+  .title-emoji { font-size:84px; display:block; margin-bottom:6px; }
+  .title-text  { font-family:'Fredoka One',sans-serif; font-size:54px; color:var(--highlight); text-shadow:3px 3px 0 #b2dfdb; }
+  .title-badge { display:inline-block; background:var(--farm); color:#fff; font-size:17px; font-weight:900; border-radius:50px; padding:4px 18px; margin-top:6px; }
+  .subtitle    { font-size:19px; color:#aaa; margin-top:6px; }
+
+  .big-btn {
+    margin-top:28px; background:var(--highlight); color:#fff;
+    border:none; border-radius:50px; padding:18px 52px;
+    font-size:28px; font-family:'Fredoka One',sans-serif;
+    cursor:pointer; box-shadow:0 6px 0 #004D40; transition:all 0.15s;
+    animation:wiggle 2.5s ease-in-out infinite;
+  }
+  .big-btn:hover  { transform:translateY(-3px); box-shadow:0 9px 0 #004D40; }
+  .big-btn:active { transform:translateY(3px);  box-shadow:0 3px 0 #004D40; }
+  @keyframes wiggle{0%,88%,100%{transform:rotate(0deg)}91%{transform:rotate(-3deg)}95%{transform:rotate(3deg)}}
+
+  /* ── TEACHER BAR ── */
+  .teacher-bar {
+    background:rgba(0,0,0,0.72); color:#fff; border-radius:50px;
+    padding:8px 20px; display:flex; gap:10px; align-items:center;
+    margin-bottom:10px; font-size:13px; flex-wrap:wrap; justify-content:center;
+  }
+  .teacher-bar span { opacity:0.65; }
+  .t-btn {
+    background:rgba(255,255,255,0.18); border:1px solid rgba(255,255,255,0.35);
+    color:#fff; border-radius:20px; padding:4px 14px;
+    font-family:'Nunito',sans-serif; font-size:13px; cursor:pointer; transition:background 0.2s;
+  }
+  .t-btn:hover       { background:rgba(255,255,255,0.32); }
+  .t-btn.active-mode { background:var(--highlight); border-color:var(--highlight); }
+
+  /* ── STAR BAR ── */
+  .star-bar { display:flex; gap:6px; font-size:26px; margin-bottom:6px; min-height:34px; }
+
+  /* ── PROGRESS DOTS ── */
+  .progress-dots { display:flex; gap:9px; margin:4px 0 14px; flex-wrap:wrap; justify-content:center; }
+  .dot { width:13px; height:13px; border-radius:50%; background:rgba(0,0,0,0.15); transition:background 0.3s; }
+  .dot.done    { background:var(--correct); }
+  .dot.current { background:var(--highlight); transform:scale(1.35); }
+
+  /* ── LEARN CARD ── */
+  .learn-card {
+    background:var(--card); border-radius:30px; padding:28px 30px 24px;
+    text-align:center; box-shadow:0 8px 30px rgba(0,0,0,0.12);
+    width:100%; max-width:500px; animation:slideIn 0.38s ease;
+  }
+  @keyframes slideIn{from{transform:translateX(60px);opacity:0}to{transform:translateX(0);opacity:1}}
+
+  .animal-emoji-big {
+    font-size:130px; display:block; cursor:pointer; line-height:1.2;
+    filter:drop-shadow(0 5px 10px rgba(0,0,0,0.16)); transition:transform 0.2s;
+  }
+  .animal-emoji-big:hover  { transform:scale(1.12) rotate(-6deg); }
+  .animal-emoji-big:active { transform:scale(0.93); }
+
+  .animal-name { font-size:50px; font-weight:900; color:var(--text); margin:8px 0 4px; letter-spacing:2px; }
+  .animal-name span { color:var(--highlight); }
+  .animal-sound-hint { font-size:17px; color:#bbb; font-style:italic; margin-bottom:6px; }
+
+  /* Habitat badge on learn card */
+  .habitat-badge {
+    display:inline-block; border-radius:50px; padding:6px 18px;
+    font-family:'Fredoka One',sans-serif; font-size:15px; color:#fff;
+    margin-bottom:12px;
+  }
+  .hab-farm   { background:var(--farm); }
+  .hab-ocean  { background:#0288D1; }
+  .hab-jungle { background:var(--jungle); }
+
+  .tap-me { font-size:14px; color:#ccc; animation:blink 2s infinite; }
+  @keyframes blink{0%,100%{opacity:1}50%{opacity:0.25}}
+
+  .nav-row { display:flex; gap:14px; margin-top:14px; justify-content:center; }
+  .nav-btn {
+    background:#fff; border:3px solid #ddd; border-radius:50px;
+    padding:11px 26px; font-size:20px;
+    font-family:'Nunito',sans-serif; font-weight:700;
+    cursor:pointer; transition:all 0.15s; color:var(--text);
+  }
+  .nav-btn:hover    { border-color:var(--highlight); color:var(--highlight); transform:scale(1.05); }
+  .nav-btn.next-btn { background:var(--highlight); color:#fff; border-color:var(--highlight); }
+  .nav-btn.next-btn:hover { color:#fff; }
+
+  /* ── QUIZ ── */
+  .quiz-card {
+    background:var(--card); border-radius:30px; padding:24px;
+    text-align:center; box-shadow:0 8px 30px rgba(0,0,0,0.12);
+    width:100%; max-width:580px; animation:slideIn 0.38s ease;
+  }
+  .quiz-label { font-size:20px; font-weight:700; color:#888; margin-bottom:4px; }
+  .quiz-word  { font-size:48px; font-weight:900; color:var(--highlight); margin-bottom:18px; }
+  .choices-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; }
+  @media(max-width:480px){ .choices-grid{ grid-template-columns:repeat(2,1fr); } }
+
+  .choice-btn {
+    background:#fafafa; border:4px solid #e8e8e8; border-radius:20px;
+    padding:14px 6px; font-size:54px; cursor:pointer; transition:all 0.2s;
+    display:flex; flex-direction:column; align-items:center; gap:4px;
+  }
+  .choice-btn:hover   { transform:scale(1.1); border-color:var(--highlight); background:#e0f2f1; }
+  .choice-btn.correct { background:#e8f5e9; border-color:var(--correct); animation:correctBounce 0.5s ease; }
+  .choice-btn.wrong   { background:#ffebee; border-color:var(--wrong);   animation:shake 0.4s ease; }
+
+  /* ── HABITAT GAME ── */
+  .habitat-intro {
+    background:var(--card); border-radius:24px; padding:16px 24px;
+    text-align:center; font-family:'Fredoka One',sans-serif; font-size:20px;
+    color:var(--highlight); box-shadow:0 4px 16px rgba(0,0,0,0.08);
+    margin-bottom:14px; width:100%; max-width:580px;
+  }
+
+  .habitats-row {
+    display:grid; grid-template-columns:repeat(3,1fr); gap:12px;
+    width:100%; max-width:580px; margin-bottom:14px;
+  }
+  @media(max-width:460px){ .habitats-row{ grid-template-columns:1fr; } }
+
+  .habitat-zone {
+    border-radius:22px; padding:14px 10px; text-align:center;
+    min-height:130px; border:4px dashed rgba(255,255,255,0.6);
+    transition:all 0.2s; position:relative;
+  }
+  .habitat-zone.farm-zone   { background:linear-gradient(160deg,#FFF8E1,#FFE082); border-color:#FFB300; }
+  .habitat-zone.ocean-zone  { background:linear-gradient(160deg,#E1F5FE,#81D4FA); border-color:#0288D1; }
+  .habitat-zone.jungle-zone { background:linear-gradient(160deg,#E8F5E9,#A5D6A7); border-color:#388E3C; }
+  .habitat-zone.drag-over   { transform:scale(1.04); border-style:solid; box-shadow:0 6px 20px rgba(0,0,0,0.15); }
+
+  .habitat-zone-title {
+    font-family:'Fredoka One',sans-serif; font-size:15px; margin-bottom:8px;
+  }
+  .farm-zone .habitat-zone-title   { color:#E65100; }
+  .ocean-zone .habitat-zone-title  { color:#01579B; }
+  .jungle-zone .habitat-zone-title { color:#1B5E20; }
+
+  .habitat-zone-icon { font-size:32px; display:block; margin-bottom:4px; }
+  .habitat-items { display:flex; flex-wrap:wrap; gap:4px; justify-content:center; min-height:40px; }
+  .habitat-item  { font-size:30px; }
+
+  .animal-drag-tray {
+    display:flex; flex-wrap:wrap; gap:12px;
+    justify-content:center; width:100%; max-width:580px;
+  }
+  .animal-drag-item {
+    background:#fff; border:3px solid #ddd; border-radius:16px;
+    padding:10px 14px; font-size:40px; cursor:grab;
+    transition:all 0.15s; user-select:none; touch-action:none;
+    display:flex; flex-direction:column; align-items:center; gap:3px;
+    box-shadow:0 3px 10px rgba(0,0,0,0.1);
+  }
+  .animal-drag-item:hover { transform:scale(1.1); border-color:var(--highlight); }
+  .animal-drag-item.used  { opacity:0.2; pointer-events:none; }
+  .animal-drag-item .drag-label { font-size:10px; font-weight:900; color:#aaa; }
+
+  .hab-correct-flash { animation:correctBounce 0.5s ease; }
+  .hab-wrong-flash   { animation:shake 0.4s ease; }
+
+  #dragGhost { position:fixed; pointer-events:none; z-index:9999; font-size:50px; display:none; transform:translate(-50%,-50%); }
+
+  .hab-next-btn {
+    display:none; margin:14px auto 0;
+    background:var(--highlight); color:#fff; border:none; border-radius:50px;
+    padding:12px 32px; font-family:'Fredoka One',sans-serif; font-size:20px;
+    cursor:pointer; box-shadow:0 5px 0 #004D40; transition:all 0.15s;
+  }
+  .hab-next-btn.show { display:block; }
+  .hab-next-btn:hover  { transform:translateY(-2px); box-shadow:0 7px 0 #004D40; }
+  .hab-next-btn:active { transform:translateY(2px);  box-shadow:0 3px 0 #004D40; }
+
+  /* ── WIN ── */
+  .win-box {
+    background:var(--card); border-radius:30px; padding:44px;
+    text-align:center; box-shadow:0 10px 40px rgba(0,0,0,0.18);
+    max-width:460px; animation:bounceIn 0.6s ease;
+  }
+  .win-emoji { font-size:80px; display:block; }
+  .win-title { font-family:'Fredoka One',sans-serif; font-size:44px; color:var(--highlight); margin:12px 0; }
+  .win-stars { font-size:38px; margin:8px 0; }
+  .win-sub   { font-size:17px; color:#888; }
+
+  /* ── FEEDBACK ── */
+  .feedback {
+    position:fixed; top:50%; left:50%; transform:translate(-50%,-50%);
+    font-size:96px; pointer-events:none; z-index:9998; display:none;
+    animation:feedbackPop 1s ease forwards;
+  }
+  @keyframes feedbackPop{0%{transform:translate(-50%,-50%) scale(0);opacity:1}50%{transform:translate(-50%,-62%) scale(1.2);opacity:1}100%{transform:translate(-50%,-82%) scale(0.9);opacity:0}}
+  @keyframes correctBounce{0%{transform:scale(1)}40%{transform:scale(1.22)}70%{transform:scale(0.96)}100%{transform:scale(1)}}
+  @keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-10px)}40%{transform:translateX(10px)}60%{transform:translateX(-8px)}80%{transform:translateX(5px)}}
+</style>
+</head>
+<body>
+
+<div class="sun">☀️</div>
+<div class="cloud">☁️</div>
+<div class="cloud">☁️</div>
+<div id="dragGhost"></div>
+<div class="feedback" id="feedback"></div>
+
+<!-- sound toggle -->
+<button id="sound-toggle" onclick="toggleSound()"
+  style="position:fixed;top:14px;left:18px;z-index:999;background:rgba(255,255,255,0.85);
+  border:2px solid #ccc;border-radius:50%;width:48px;height:48px;font-size:24px;
+  cursor:pointer;box-shadow:0 3px 10px rgba(0,0,0,0.15);">🔊</button>
+
+<!-- ══════════════ TITLE ══════════════ -->
+<div class="screen active" id="screen-title">
+  <div class="title-box">
+    <span class="title-emoji">🦒</span>
+    <div class="title-text">ANIMALS!</div>
+    <div class="title-badge">Part 2</div>
+    <div class="subtitle">8 new animals to meet! 🌍</div>
+    <button class="big-btn" onclick="startLesson()">▶ START</button>
+  </div>
+</div>
+
+<!-- ══════════════ LEARN ══════════════ -->
+<div class="screen" id="screen-learn">
+  <div class="teacher-bar">
+    <span>Teacher:</span>
+    <button class="t-btn active-mode" id="tl-learn"   onclick="setMode('learn')">📖 Learn</button>
+    <button class="t-btn"             id="tl-quiz"    onclick="setMode('quiz')">❓ Quiz</button>
+    <button class="t-btn"             id="tl-habitat" onclick="setMode('habitat')">🌍 Habitats</button>
+  </div>
+  <div class="star-bar"      id="star-bar-learn"></div>
+  <div class="progress-dots" id="progress-dots"></div>
+
+  <div class="learn-card" id="learn-card">
+    <span class="animal-emoji-big" id="learn-emoji" onclick="bounce()">🦒</span>
+    <div class="animal-name"       id="learn-name">GIRAFFE</div>
+    <div class="animal-sound-hint" id="learn-sound">🔊 "giraffe"</div>
+    <div class="habitat-badge hab-jungle" id="learn-habitat">🌿 Jungle / Safari</div>
+    <div class="tap-me">👆 Tap the animal!</div>
+    <div class="nav-row">
+      <button class="nav-btn"          onclick="prevAnimal()">⬅ Back</button>
+      <button class="nav-btn next-btn" onclick="nextAnimal()">Next ➡</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ QUIZ ══════════════ -->
+<div class="screen" id="screen-quiz">
+  <div class="teacher-bar">
+    <span>Teacher:</span>
+    <button class="t-btn"             id="tq-learn"   onclick="setMode('learn')">📖 Learn</button>
+    <button class="t-btn active-mode" id="tq-quiz"    onclick="setMode('quiz')">❓ Quiz</button>
+    <button class="t-btn"             id="tl-habitat2" onclick="setMode('habitat')">🌍 Habitats</button>
+  </div>
+  <div class="star-bar" id="star-bar-quiz"></div>
+
+  <div class="quiz-card">
+    <div class="quiz-label">Find the...</div>
+    <div class="quiz-word" id="quiz-word">GIRAFFE</div>
+    <div class="choices-grid" id="choices-grid"></div>
+  </div>
+</div>
+
+<!-- ══════════════ HABITAT ══════════════ -->
+<div class="screen" id="screen-habitat">
+  <div class="teacher-bar">
+    <span>Teacher:</span>
+    <button class="t-btn"             id="th-learn"   onclick="setMode('learn')">📖 Learn</button>
+    <button class="t-btn"             id="th-quiz"    onclick="setMode('quiz')">❓ Quiz</button>
+    <button class="t-btn active-mode" id="th-habitat" onclick="setMode('habitat')">🌍 Habitats</button>
+  </div>
+  <div class="star-bar" id="star-bar-habitat"></div>
+
+  <div class="habitat-intro">🌍 Where do they live? Drag to the right home!</div>
+
+  <div class="habitats-row">
+    <div class="habitat-zone farm-zone" id="zone-farm">
+      <span class="habitat-zone-icon">🏡</span>
+      <div class="habitat-zone-title">FARM</div>
+      <div class="habitat-items" id="zone-farm-items"></div>
+    </div>
+    <div class="habitat-zone ocean-zone" id="zone-ocean">
+      <span class="habitat-zone-icon">🌊</span>
+      <div class="habitat-zone-title">OCEAN</div>
+      <div class="habitat-items" id="zone-ocean-items"></div>
+    </div>
+    <div class="habitat-zone jungle-zone" id="zone-jungle">
+      <span class="habitat-zone-icon">🌿</span>
+      <div class="habitat-zone-title">JUNGLE</div>
+      <div class="habitat-items" id="zone-jungle-items"></div>
+    </div>
+  </div>
+
+  <div class="animal-drag-tray" id="animal-drag-tray"></div>
+  <button class="hab-next-btn" id="hab-next-btn" onclick="nextHabitatRound()">Next ➡ 🌟</button>
+</div>
+
+<!-- ══════════════ WIN ══════════════ -->
+<div class="screen" id="screen-win">
+  <div class="win-box">
+    <span class="win-emoji">🎉</span>
+    <div class="win-title">Amazing!</div>
+    <div class="win-stars" id="win-stars">⭐⭐⭐</div>
+    <div class="win-sub">You know 8 new animals! 🦒🐋🐄</div>
+    <button class="big-btn" style="animation:none" onclick="restartQuiz()">Play Again 🔄</button>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════
+// DATA
+// ═══════════════════════════════════════════════════════
+const animals = [
+  { emoji:'🦒', name:'GIRAFFE',  sound:'giraffe',   habitat:'jungle' },
+  { emoji:'🐄', name:'COW',      sound:'moo',        habitat:'farm'   },
+  { emoji:'🦈', name:'SHARK',    sound:'shark',      habitat:'ocean'  },
+  { emoji:'🐷', name:'PIG',      sound:'oink oink',  habitat:'farm'   },
+  { emoji:'🐋', name:'WHALE',    sound:'whale',      habitat:'ocean'  },
+  { emoji:'🦓', name:'ZEBRA',    sound:'zebra',      habitat:'jungle' },
+  { emoji:'🐔', name:'CHICKEN',  sound:'cluck cluck',habitat:'farm'   },
+  { emoji:'🐙', name:'OCTOPUS',  sound:'octopus',    habitat:'ocean'  },
+];
+
+const habitatInfo = {
+  farm:   { label:'FARM',   icon:'🏡', class:'farm-zone',   badge:'hab-farm'   },
+  ocean:  { label:'OCEAN',  icon:'🌊', class:'ocean-zone',  badge:'hab-ocean'  },
+  jungle: { label:'JUNGLE', icon:'🌿', class:'jungle-zone', badge:'hab-jungle' },
+};
+
+// ═══════════════════════════════════════════════════════
+// TTS
+// ═══════════════════════════════════════════════════════
+let ttsReady=false, soundOn=true, ttsVoice=null;
+function unlockTTS(){
+  if(ttsReady)return; ttsReady=true;
+  const u=new SpeechSynthesisUtterance(' '); u.volume=0;
+  window.speechSynthesis.speak(u); pickVoice();
+}
+function pickVoice(){
+  const v=window.speechSynthesis.getVoices();
+  ttsVoice=v.find(x=>x.lang==='en-US'&&x.localService)||
+           v.find(x=>x.lang==='en-US')||
+           v.find(x=>x.lang.startsWith('en-')&&x.localService)||
+           v.find(x=>x.lang.startsWith('en'))||v[0]||null;
+}
+if(window.speechSynthesis){ window.speechSynthesis.onvoiceschanged=pickVoice; pickVoice(); }
+function speak(text,rate=0.78){
+  if(!soundOn||!window.speechSynthesis)return;
+  window.speechSynthesis.cancel();
+  const u=new SpeechSynthesisUtterance(text);
+  u.rate=rate; u.pitch=1.05; u.volume=1;
+  if(ttsVoice)u.voice=ttsVoice;
+  window.speechSynthesis.speak(u);
+}
+function toggleSound(){
+  soundOn=!soundOn;
+  document.getElementById('sound-toggle').textContent=soundOn?'🔊':'🔇';
+}
+document.addEventListener('touchstart',unlockTTS,{once:true});
+document.addEventListener('mousedown', unlockTTS,{once:true});
+
+// ═══════════════════════════════════════════════════════
+// SCREENS & STATE
+// ═══════════════════════════════════════════════════════
+let current=0, stars=0, quizAnswered=false, habDragItem=null;
+
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('screen-'+id).classList.add('active');
+}
+function startLesson(){ showScreen('learn'); renderProgress(); updateLearnCard(); renderStars(); }
+
+function setMode(m){
+  ['learn','quiz','habitat'].forEach(mode=>{
+    ['tl','tq','th'].forEach(prefix=>{
+      const el=document.getElementById(prefix+'-'+mode) ||
+               document.getElementById(prefix+'l-'+mode+'2') ||
+               document.getElementById('tl-'+mode+'2');
+      if(el) el.className='t-btn'+(mode===m?' active-mode':'');
+    });
+  });
+  if(m==='learn')  { showScreen('learn');   renderProgress(); updateLearnCard(); renderStars(); }
+  if(m==='quiz')   { showScreen('quiz');    renderStars(); newQuiz(); }
+  if(m==='habitat'){ showScreen('habitat'); initHabitat(); }
+}
+
+// ═══════════════════════════════════════════════════════
+// LEARN
+// ═══════════════════════════════════════════════════════
+function updateLearnCard(){
+  const a=animals[current];
+  document.getElementById('learn-emoji').textContent=a.emoji;
+  document.getElementById('learn-name').innerHTML=
+    '<span>'+a.name[0]+'</span>'+a.name.slice(1).toLowerCase();
+  document.getElementById('learn-sound').textContent='🔊 "'+a.sound+'"';
+  const hab=habitatInfo[a.habitat];
+  const badge=document.getElementById('learn-habitat');
+  badge.textContent=hab.icon+' '+hab.label;
+  badge.className='habitat-badge '+hab.badge;
+  renderProgress();
+  speak(a.name, 0.75);
+}
+function nextAnimal(){
+  if(current<animals.length-1){ current++; animateCard(); updateLearnCard(); }
+  else showFeedback('🌟');
+}
+function prevAnimal(){ if(current>0){ current--; updateLearnCard(); } }
+function animateCard(){
+  const c=document.getElementById('learn-card');
+  c.style.animation='none';
+  setTimeout(()=>{ c.style.animation='slideIn 0.38s ease'; },10);
+}
+function bounce(){
+  const el=document.getElementById('learn-emoji');
+  el.style.transform='scale(1.3) rotate(-8deg)';
+  setTimeout(()=>{ el.style.transform=''; },280);
+  speak(animals[current].name, 0.75);
+  showFeedback(animals[current].emoji);
+}
+function renderProgress(){
+  const dots=document.getElementById('progress-dots');
+  dots.innerHTML='';
+  animals.forEach((_,i)=>{
+    const d=document.createElement('div');
+    d.className='dot'+(i<current?' done':'')+(i===current?' current':'');
+    dots.appendChild(d);
+  });
+}
+
+// ═══════════════════════════════════════════════════════
+// STARS
+// ═══════════════════════════════════════════════════════
+function addStar(){ stars++; renderStars(); }
+function renderStars(){
+  ['star-bar-learn','star-bar-quiz','star-bar-habitat'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(!el)return; el.innerHTML='';
+    for(let i=0;i<stars;i++){ const s=document.createElement('span'); s.textContent='⭐'; el.appendChild(s); }
+  });
+}
+
+// ═══════════════════════════════════════════════════════
+// QUIZ
+// ═══════════════════════════════════════════════════════
+function newQuiz(){
+  quizAnswered=false;
+  const correctIdx=Math.floor(Math.random()*animals.length);
+  const correct=animals[correctIdx];
+  document.getElementById('quiz-word').textContent=correct.name;
+  speak(correct.name, 0.75);
+
+  // Build full choices array then shuffle thoroughly
+  const others=[...animals.filter((_,i)=>i!==correctIdx)];
+  const choices=[correct,...others];
+  // Fisher-Yates on the full array ensures correct answer lands anywhere
+  for(let i=choices.length-1;i>0;i--){
+    const j=Math.floor(Math.random()*(i+1));
+    [choices[i],choices[j]]=[choices[j],choices[i]];
+  }
+
+  const grid=document.getElementById('choices-grid');
+  grid.innerHTML='';
+  choices.forEach(a=>{
+    const btn=document.createElement('button');
+    btn.className='choice-btn';
+    btn.dataset.name=a.name;
+    btn.innerHTML=`<span>${a.emoji}</span>`;
+    btn.onclick=()=>handleQuiz(btn,a.name,correct.name);
+    grid.appendChild(btn);
+  });
+}
+function handleQuiz(btn,chosen,correct){
+  if(quizAnswered)return; quizAnswered=true;
+  if(chosen===correct){
+    btn.classList.add('correct'); showFeedback('⭐'); addStar();
+    speak(correct+'! Great job!');
+    setTimeout(newQuiz,1300);
+  } else {
+    btn.classList.add('wrong'); showFeedback('❌'); speak('Try again!');
+    document.querySelectorAll('.choice-btn').forEach(b=>{ if(b.dataset.name===correct) b.classList.add('correct'); });
+    setTimeout(newQuiz,1600);
+  }
+}
+
+// ═══════════════════════════════════════════════════════
+// HABITAT GAME
+// ═══════════════════════════════════════════════════════
+let habPlaced=0, habRound=0;
+
+function initHabitat(){
+  habPlaced=0; habRound=0;
+  ['farm','ocean','jungle'].forEach(h=>{
+    document.getElementById('zone-'+h+'-items').innerHTML='';
+    const zone=document.getElementById('zone-'+h);
+    zone.classList.remove('drag-over');
+  });
+  document.getElementById('hab-next-btn').classList.remove('show');
+  setupHabitatZones();
+  renderHabitatTray(shuffle([...animals]));
+  renderStars();
+}
+
+function setupHabitatZones(){
+  ['farm','ocean','jungle'].forEach(type=>{
+    const zone=document.getElementById('zone-'+type);
+    // Remove old listeners by cloning
+    const newZone=zone.cloneNode(true);
+    zone.parentNode.replaceChild(newZone,zone);
+    newZone.addEventListener('dragover',e=>{ e.preventDefault(); newZone.classList.add('drag-over'); });
+    newZone.addEventListener('dragleave',()=>newZone.classList.remove('drag-over'));
+    newZone.addEventListener('drop',e=>{ e.preventDefault(); newZone.classList.remove('drag-over'); handleHabitatDrop(type); });
+    // Touch
+    newZone.addEventListener('touchend',(e)=>{
+      e.preventDefault();
+      document.getElementById('dragGhost').style.display='none';
+      const t=e.changedTouches[0];
+      const el=document.elementFromPoint(t.clientX,t.clientY);
+      const z=el?el.closest('.habitat-zone'):null;
+      if(z){
+        const zType=['farm','ocean','jungle'].find(h=>z.id==='zone-'+h);
+        if(zType) handleHabitatDrop(zType);
+      }
+      habDragItem=null;
+    },{passive:false});
+  });
+}
+
+function renderHabitatTray(animalList){
+  const tray=document.getElementById('animal-drag-tray');
+  tray.innerHTML='';
+  animalList.forEach(a=>{
+    const el=document.createElement('div');
+    el.className='animal-drag-item';
+    el.innerHTML=`${a.emoji}<span class="drag-label">${a.name}</span>`;
+    el.dataset.name=a.name;
+    el.dataset.habitat=a.habitat;
+    el.dataset.emoji=a.emoji;
+    el.draggable=true;
+    el.addEventListener('dragstart',e=>{
+      habDragItem={name:a.name,habitat:a.habitat,emoji:a.emoji,el};
+      e.dataTransfer.effectAllowed='move';
+      e.dataTransfer.setData('text/plain',a.name);
+      setTimeout(()=>el.style.opacity='0.4',0);
+    });
+    el.addEventListener('dragend',()=>el.style.opacity='1');
+    el.addEventListener('touchstart',e=>{
+      e.preventDefault();
+      habDragItem={name:a.name,habitat:a.habitat,emoji:a.emoji,el};
+      const ghost=document.getElementById('dragGhost');
+      ghost.textContent=a.emoji; ghost.style.display='block';
+      moveTouchGhost(e.touches[0]);
+    },{passive:false});
+    el.addEventListener('touchmove',e=>{ e.preventDefault(); moveTouchGhost(e.touches[0]); },{passive:false});
+    tray.appendChild(el);
+  });
+}
+
+function moveTouchGhost(touch){
+  const g=document.getElementById('dragGhost');
+  g.style.left=touch.clientX+'px'; g.style.top=touch.clientY+'px';
+}
+
+function handleHabitatDrop(droppedZone){
+  if(!habDragItem)return;
+  const animal=habDragItem; habDragItem=null;
+  const zone=document.getElementById('zone-'+droppedZone);
+
+  if(droppedZone===animal.habitat){
+    // Correct!
+    const item=document.createElement('span');
+    item.className='habitat-item'; item.textContent=animal.emoji;
+    document.getElementById('zone-'+droppedZone+'-items').appendChild(item);
+    animal.el.classList.add('used');
+    zone.classList.add('hab-correct-flash');
+    setTimeout(()=>zone.classList.remove('hab-correct-flash'),500);
+    showFeedback('⭐'); addStar();
+    speak(animal.name+' lives in the '+droppedZone+'!', 0.78);
+    habPlaced++;
+    if(habPlaced>=animals.length){
+      setTimeout(()=>{ showFeedback('🎉'); speak('Amazing! You know where they all live!'); document.getElementById('hab-next-btn').classList.add('show'); },400);
+    }
+  } else {
+    // Wrong
+    zone.classList.add('hab-wrong-flash');
+    setTimeout(()=>zone.classList.remove('hab-wrong-flash'),500);
+    showFeedback('❌'); speak('Try again!');
+  }
+}
+
+function nextHabitatRound(){
+  showFeedback('🎉');
+  setTimeout(()=>{ showScreen('win'); document.getElementById('win-stars').textContent='⭐'.repeat(Math.min(5,stars)); },800);
+}
+function restartQuiz(){ stars=0; current=0; setMode('quiz'); }
+
+// ═══════════════════════════════════════════════════════
+// UTILS
+// ═══════════════════════════════════════════════════════
+function shuffle(arr){
+  const a=[...arr];
+  for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}
+  return a;
+}
+function showFeedback(emoji){
+  const el=document.getElementById('feedback');
+  el.textContent=emoji; el.style.display='block'; el.style.animation='none';
+  setTimeout(()=>{ el.style.animation='feedbackPop 1s ease forwards'; },10);
+  setTimeout(()=>{ el.style.display='none'; },1050);
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ABC Homework! 🔤</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;700;900&display=swap');
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg1: #E8EAF6;
+    --bg2: #C5CAE9;
+    --a1: #5C6BC0;
+    --a2: #FF7043;
+    --a3: #26A69A;
+    --correct: #43A047;
+    --wrong: #E53935;
+    --card: #ffffff;
+    --text: #2c2c2c;
+  }
+
+  body {
+    font-family: 'Nunito', sans-serif;
+    min-height: 100vh;
+    background: linear-gradient(160deg, var(--bg1) 0%, var(--bg2) 100%);
+    display: flex; flex-direction: column; align-items: center;
+    padding: 10px 10px 50px;
+    overflow-x: hidden;
+  }
+
+  /* Floating letters */
+  .floatie {
+    position: fixed; font-family: 'Fredoka One', sans-serif;
+    font-size: 38px; opacity: 0.07; pointer-events: none;
+    color: var(--a1);
+    animation: floatUp linear infinite;
+  }
+  .floatie:nth-child(1){left:4%;  animation-duration:13s; animation-delay:0s;}
+  .floatie:nth-child(2){left:18%; animation-duration:19s; animation-delay:-6s;}
+  .floatie:nth-child(3){left:50%; animation-duration:11s; animation-delay:-4s;}
+  .floatie:nth-child(4){left:75%; animation-duration:17s; animation-delay:-9s;}
+  .floatie:nth-child(5){left:88%; animation-duration:15s; animation-delay:-2s;}
+  @keyframes floatUp {
+    from{transform:translateY(110vh)} to{transform:translateY(-10vh)}
+  }
+
+  .screen { display:none; width:100%; max-width:720px; flex-direction:column; align-items:center; }
+  .screen.active { display:flex; }
+
+  /* ── HOME ── */
+  .home-box {
+    background: var(--card); border-radius: 32px;
+    padding: 36px 44px; text-align: center;
+    box-shadow: 0 10px 40px rgba(92,107,192,0.2);
+    margin-top: 50px; animation: bounceIn 0.6s ease;
+  }
+  @keyframes bounceIn {
+    0%{transform:scale(0.5);opacity:0} 70%{transform:scale(1.05)} 100%{transform:scale(1);opacity:1}
+  }
+  .home-title { font-family:'Fredoka One',sans-serif; font-size:52px; color:var(--a1); }
+  .home-sub   { font-size:18px; color:#aaa; margin:6px 0 24px; }
+
+  .activity-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px; width:100%; }
+  @media(max-width:500px){ .activity-grid{ grid-template-columns:1fr; } }
+
+  .act-card {
+    background:#fff; border-radius:24px; padding:24px 16px; text-align:center;
+    box-shadow:0 6px 20px rgba(0,0,0,0.10); cursor:pointer;
+    border:3px solid transparent; transition:all 0.2s;
+  }
+  .act-card:hover { transform:scale(1.05); }
+  .act-card.act1:hover { border-color:var(--a1); }
+  .act-card.act2:hover { border-color:var(--a2); }
+  .act-card.act3:hover { border-color:var(--a3); }
+  .act-icon  { font-size:52px; display:block; margin-bottom:10px; }
+  .act-label { font-family:'Fredoka One',sans-serif; font-size:19px; color:var(--text); }
+  .act-stars { font-size:16px; margin-top:6px; min-height:22px; }
+
+  /* ── SHARED HEADER ── */
+  .lesson-header {
+    background:rgba(0,0,0,0.68); color:#fff; border-radius:50px;
+    padding:8px 22px; display:flex; gap:12px; align-items:center;
+    margin-bottom:12px; flex-wrap:wrap; justify-content:center; font-size:14px;
+  }
+  .back-btn {
+    background:rgba(255,255,255,0.2); border:1px solid rgba(255,255,255,0.35);
+    color:#fff; border-radius:20px; padding:4px 16px;
+    font-family:'Nunito',sans-serif; font-size:13px; font-weight:700;
+    cursor:pointer; transition:background 0.2s;
+  }
+  .back-btn:hover { background:rgba(255,255,255,0.35); }
+
+  .act-title-bar {
+    font-family:'Fredoka One',sans-serif; font-size:24px;
+    border-radius:50px; padding:8px 28px; color:#fff;
+    margin-bottom:14px; text-align:center;
+  }
+  .bar-blue  { background:var(--a1); }
+  .bar-orange{ background:var(--a2); }
+  .bar-teal  { background:var(--a3); }
+
+  .star-row { display:flex; gap:6px; font-size:24px; margin-bottom:10px; min-height:32px; flex-wrap:wrap; justify-content:center; }
+
+  /* ── ACTIVITY 1: LETTER RECOGNITION ── */
+  .recog-card {
+    background:var(--card); border-radius:30px; padding:28px 24px;
+    text-align:center; box-shadow:0 8px 28px rgba(0,0,0,0.11);
+    width:100%; max-width:540px; animation:slideIn 0.4s ease;
+  }
+  @keyframes slideIn{from{transform:translateX(60px);opacity:0}to{transform:translateX(0);opacity:1}}
+
+  .recog-prompt { font-family:'Fredoka One',sans-serif; font-size:22px; color:#777; margin-bottom:16px; }
+  .recog-target {
+    font-family:'Fredoka One',sans-serif; font-size:110px; color:var(--a1);
+    line-height:1; margin-bottom:20px;
+    filter:drop-shadow(0 4px 8px rgba(92,107,192,0.3));
+    animation: letterPulse 2s ease-in-out infinite;
+  }
+  @keyframes letterPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
+
+  .letter-choices {
+    display:grid; grid-template-columns:repeat(4,1fr); gap:12px;
+  }
+  .letter-btn {
+    background:#f5f5f5; border:4px solid #e0e0e0; border-radius:18px;
+    padding:14px 8px; font-family:'Fredoka One',sans-serif; font-size:42px;
+    color:var(--text); cursor:pointer; transition:all 0.2s;
+  }
+  .letter-btn:hover  { transform:scale(1.1); border-color:var(--a1); background:#eef0ff; }
+  .letter-btn.correct{ background:#e8f5e9; border-color:var(--correct); animation:correctBounce 0.5s ease; }
+  .letter-btn.wrong  { background:#ffebee; border-color:var(--wrong);   animation:shake 0.4s ease; }
+
+  /* Progress bar */
+  .progress-wrap { width:100%; max-width:540px; margin-bottom:10px; }
+  .progress-bar-bg {
+    background:rgba(0,0,0,0.1); border-radius:50px; height:12px; overflow:hidden;
+  }
+  .progress-bar-fill {
+    background:var(--a1); height:100%; border-radius:50px;
+    transition:width 0.4s ease;
+  }
+  .progress-label { font-size:13px; color:#888; text-align:right; margin-top:4px; }
+
+  /* ── ACTIVITY 2: UPPERCASE → LOWERCASE ── */
+  .match-stage {
+    background:var(--card); border-radius:30px; padding:24px 20px;
+    box-shadow:0 8px 28px rgba(0,0,0,0.11);
+    width:100%; max-width:560px;
+  }
+  .match-prompt { font-family:'Fredoka One',sans-serif; font-size:20px; color:#777; text-align:center; margin-bottom:6px; }
+
+  .match-upper {
+    font-family:'Fredoka One',sans-serif; font-size:96px; color:var(--a2);
+    text-align:center; line-height:1.1; margin-bottom:18px;
+    filter:drop-shadow(0 4px 8px rgba(255,112,67,0.25));
+  }
+
+  .lower-grid {
+    display:grid; grid-template-columns:repeat(4,1fr); gap:10px;
+  }
+  .lower-btn {
+    background:#fff8f5; border:4px solid #ffd0c0; border-radius:16px;
+    padding:12px 6px; font-family:'Fredoka One',sans-serif; font-size:38px;
+    color:var(--text); cursor:pointer; transition:all 0.2s;
+  }
+  .lower-btn:hover  { transform:scale(1.1); border-color:var(--a2); }
+  .lower-btn.correct{ background:#e8f5e9; border-color:var(--correct); animation:correctBounce 0.5s ease; }
+  .lower-btn.wrong  { background:#ffebee; border-color:var(--wrong);   animation:shake 0.4s ease; }
+
+  /* ── ACTIVITY 3: FIND THE LETTER IN WORD ── */
+  .word-card {
+    background:var(--card); border-radius:30px; padding:26px 22px;
+    box-shadow:0 8px 28px rgba(0,0,0,0.11);
+    width:100%; max-width:560px; text-align:center;
+    animation:slideIn 0.4s ease;
+  }
+  .word-prompt { font-family:'Fredoka One',sans-serif; font-size:22px; color:#777; margin-bottom:6px; }
+  .word-target-letter {
+    font-family:'Fredoka One',sans-serif; font-size:90px; color:var(--a3);
+    line-height:1; margin-bottom:10px;
+    filter:drop-shadow(0 4px 8px rgba(38,166,154,0.25));
+  }
+  .word-emoji { font-size:70px; margin-bottom:8px; display:block; }
+  .word-display {
+    display:flex; justify-content:center; gap:8px; flex-wrap:wrap;
+    margin-bottom:20px;
+  }
+  .word-letter-btn {
+    background:#f0fafa; border:4px solid #b2dfdb; border-radius:14px;
+    width:58px; height:68px;
+    font-family:'Fredoka One',sans-serif; font-size:34px;
+    color:var(--text); cursor:pointer; transition:all 0.2s;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .word-letter-btn:hover  { transform:scale(1.12); border-color:var(--a3); }
+  .word-letter-btn.correct{ background:#e8f5e9; border-color:var(--correct); animation:correctBounce 0.5s ease; }
+  .word-letter-btn.wrong  { background:#ffebee; border-color:var(--wrong);   animation:shake 0.4s ease; }
+  .word-letter-btn.found  { background:#e0f2f1; border-color:var(--a3); color:var(--a3); }
+
+  /* ── WIN ── */
+  .win-box {
+    background:var(--card); border-radius:30px; padding:44px;
+    text-align:center; box-shadow:0 10px 40px rgba(0,0,0,0.18);
+    max-width:460px; animation:bounceIn 0.6s ease;
+  }
+  .win-emoji { font-size:80px; display:block; }
+  .win-title { font-family:'Fredoka One',sans-serif; font-size:44px; color:var(--a1); margin:12px 0; }
+  .win-stars { font-size:36px; margin:8px 0; }
+  .win-sub   { font-size:17px; color:#888; }
+
+  .big-btn {
+    margin-top:26px; background:var(--a1); color:#fff;
+    border:none; border-radius:50px; padding:16px 48px;
+    font-size:24px; font-family:'Fredoka One',sans-serif;
+    cursor:pointer; box-shadow:0 6px 0 #3949AB; transition:all 0.15s;
+  }
+  .big-btn:hover  { transform:translateY(-3px); box-shadow:0 9px 0 #3949AB; }
+  .big-btn:active { transform:translateY(3px);  box-shadow:0 3px 0 #3949AB; }
+
+  /* ── FEEDBACK ── */
+  .feedback {
+    position:fixed; top:50%; left:50%; transform:translate(-50%,-50%);
+    font-size:90px; pointer-events:none; z-index:9998;
+    display:none; animation:feedbackPop 1s ease forwards;
+  }
+  @keyframes feedbackPop {
+    0%  {transform:translate(-50%,-50%) scale(0);opacity:1}
+    50% {transform:translate(-50%,-62%) scale(1.2);opacity:1}
+    100%{transform:translate(-50%,-82%) scale(0.9);opacity:0}
+  }
+  @keyframes correctBounce{0%{transform:scale(1)}40%{transform:scale(1.22)}70%{transform:scale(0.96)}100%{transform:scale(1)}}
+  @keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-10px)}40%{transform:translateX(10px)}60%{transform:translateX(-8px)}80%{transform:translateX(5px)}}
+</style>
+</head>
+<body>
+
+<div class="floatie">A</div>
+<div class="floatie">B</div>
+<div class="floatie">C</div>
+<div class="floatie">D</div>
+<div class="floatie">E</div>
+<div class="feedback" id="feedback"></div>
+
+<!-- sound toggle -->
+<button id="sound-toggle" onclick="toggleSound()" title="Sound on"
+  style="position:fixed;top:14px;left:18px;z-index:999;background:rgba(255,255,255,0.85);
+  border:2px solid #ccc;border-radius:50%;width:48px;height:48px;font-size:24px;
+  cursor:pointer;box-shadow:0 3px 10px rgba(0,0,0,0.15);transition:transform 0.15s;"
+  onmouseover="this.style.transform='scale(1.15)'" onmouseout="this.style.transform='scale(1)'">🔊</button>
+
+<!-- ══════════ HOME ══════════ -->
+<div class="screen active" id="screen-home">
+  <div class="home-box">
+    <div class="home-title">🔤 ABC Homework!</div>
+    <div class="home-sub">3 alphabet activities 🌟</div>
+    <div class="activity-grid">
+      <div class="act-card act1" onclick="startActivity(1)">
+        <span class="act-icon">🔡</span>
+        <div class="act-label">Find the Letter!</div>
+        <div class="act-stars" id="home-stars-1"></div>
+      </div>
+      <div class="act-card act2" onclick="startActivity(2)">
+        <span class="act-icon">🔠</span>
+        <div class="act-label">Big & Small!</div>
+        <div class="act-stars" id="home-stars-2"></div>
+      </div>
+      <div class="act-card act3" onclick="startActivity(3)">
+        <span class="act-icon">🔍</span>
+        <div class="act-label">Find in Word!</div>
+        <div class="act-stars" id="home-stars-3"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ ACT 1: LETTER RECOGNITION ══════════ -->
+<div class="screen" id="screen-act1">
+  <div class="lesson-header">
+    <button class="back-btn" onclick="goHome()">🏠 Home</button>
+    <span>🔡 Find the Letter!</span>
+  </div>
+  <div class="act-title-bar bar-blue">👆 Find the letter!</div>
+  <div class="star-row" id="recog-stars"></div>
+  <div class="progress-wrap">
+    <div class="progress-bar-bg"><div class="progress-bar-fill" id="recog-progress" style="width:0%"></div></div>
+    <div class="progress-label" id="recog-progress-label">0 / 26</div>
+  </div>
+  <div class="recog-card">
+    <div class="recog-prompt">Find the letter...</div>
+    <div class="recog-target" id="recog-target">A</div>
+    <div class="letter-choices" id="recog-choices"></div>
+  </div>
+</div>
+
+<!-- ══════════ ACT 2: UPPERCASE → LOWERCASE ══════════ -->
+<div class="screen" id="screen-act2">
+  <div class="lesson-header">
+    <button class="back-btn" onclick="goHome()">🏠 Home</button>
+    <span>🔠 Big & Small!</span>
+  </div>
+  <div class="act-title-bar bar-orange">Match the big letter to the small letter!</div>
+  <div class="star-row" id="match-stars"></div>
+  <div class="progress-wrap">
+    <div class="progress-bar-bg"><div class="progress-bar-fill" id="match-progress" style="width:0%; background:var(--a2)"></div></div>
+    <div class="progress-label" id="match-progress-label">0 / 26</div>
+  </div>
+  <div class="match-stage">
+    <div class="match-prompt">Find the small letter...</div>
+    <div class="match-upper" id="match-upper">A</div>
+    <div class="lower-grid" id="lower-grid"></div>
+  </div>
+</div>
+
+<!-- ══════════ ACT 3: FIND LETTER IN WORD ══════════ -->
+<div class="screen" id="screen-act3">
+  <div class="lesson-header">
+    <button class="back-btn" onclick="goHome()">🏠 Home</button>
+    <span>🔍 Find in Word!</span>
+  </div>
+  <div class="act-title-bar bar-teal">Find the letter in the word!</div>
+  <div class="star-row" id="word-stars"></div>
+  <div class="progress-wrap">
+    <div class="progress-bar-bg"><div class="progress-bar-fill" id="word-progress" style="width:0%; background:var(--a3)"></div></div>
+    <div class="progress-label" id="word-progress-label">0 / 10</div>
+  </div>
+  <div class="word-card">
+    <div class="word-prompt">Find the letter...</div>
+    <div class="word-target-letter" id="word-target-letter">A</div>
+    <span class="word-emoji" id="word-emoji">🍎</span>
+    <div class="word-display" id="word-display"></div>
+  </div>
+</div>
+
+<!-- ══════════ WIN ══════════ -->
+<div class="screen" id="screen-win">
+  <div class="win-box">
+    <span class="win-emoji">🎉</span>
+    <div class="win-title">Amazing!</div>
+    <div class="win-stars" id="win-stars-display">⭐⭐⭐</div>
+    <div class="win-sub">Show your teacher next class! 👩‍🏫</div>
+    <button class="big-btn" onclick="goHome()">🏠 Play Again</button>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════
+// DATA
+// ═══════════════════════════════════════════════════════════
+const LETTERS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+
+// Word bank: letter → { word, emoji }
+const wordBank = {
+  A:{ word:'APPLE',     emoji:'🍎' }, B:{ word:'BALL',      emoji:'⚽' },
+  C:{ word:'CAT',       emoji:'🐱' }, D:{ word:'DOG',       emoji:'🐶' },
+  E:{ word:'EGG',       emoji:'🥚' }, F:{ word:'FISH',      emoji:'🐟' },
+  G:{ word:'GRAPES',    emoji:'🍇' }, H:{ word:'HOUSE',     emoji:'🏠' },
+  I:{ word:'ICE CREAM', emoji:'🍦' }, J:{ word:'JAM',       emoji:'🍓' },
+  K:{ word:'KITE',      emoji:'🪁' }, L:{ word:'LION',      emoji:'🦁' },
+  M:{ word:'MOON',      emoji:'🌙' }, N:{ word:'NOODLES',   emoji:'🍜' },
+  O:{ word:'ORANGE',    emoji:'🍊' }, P:{ word:'PIZZA',     emoji:'🍕' },
+  Q:{ word:'QUEEN',     emoji:'👑' }, R:{ word:'RAINBOW',   emoji:'🌈' },
+  S:{ word:'STAR',      emoji:'⭐' }, T:{ word:'TIGER',     emoji:'🐯' },
+  U:{ word:'UMBRELLA',  emoji:'☂️'  }, V:{ word:'VAN',       emoji:'🚐' },
+  W:{ word:'WHALE',     emoji:'🐋' }, X:{ word:'X-RAY',     emoji:'🩻' },
+  Y:{ word:'YAK',       emoji:'🐃' }, Z:{ word:'ZEBRA',     emoji:'🦓' },
+};
+
+// ═══════════════════════════════════════════════════════════
+// TTS
+// ═══════════════════════════════════════════════════════════
+let ttsReady = false;
+let soundOn  = true;
+let ttsVoice = null;
+
+function unlockTTS() {
+  if (ttsReady) return;
+  ttsReady = true;
+  const u = new SpeechSynthesisUtterance(' ');
+  u.volume = 0;
+  window.speechSynthesis.speak(u);
+  pickVoice();
+}
+function pickVoice() {
+  const voices = window.speechSynthesis.getVoices();
+  ttsVoice = voices.find(v => v.lang.startsWith('en-') && v.localService) ||
+             voices.find(v => v.lang.startsWith('en')) ||
+             voices[0] || null;
+}
+if (window.speechSynthesis) {
+  window.speechSynthesis.onvoiceschanged = pickVoice;
+  pickVoice();
+}
+function speak(text, rate=0.78) {
+  if (!soundOn || !window.speechSynthesis) return;
+  window.speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.rate=rate; u.pitch=1.1; u.volume=1;
+  if (ttsVoice) u.voice=ttsVoice;
+  window.speechSynthesis.speak(u);
+}
+function toggleSound() {
+  soundOn = !soundOn;
+  document.getElementById('sound-toggle').textContent = soundOn ? '🔊' : '🔇';
+}
+document.addEventListener('touchstart', unlockTTS, {once:true});
+document.addEventListener('mousedown',  unlockTTS, {once:true});
+
+// ═══════════════════════════════════════════════════════════
+// SCREENS & STATE
+// ═══════════════════════════════════════════════════════════
+const actStars = {1:0, 2:0, 3:0};
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-' + id).classList.add('active');
+}
+function goHome() {
+  updateHomeStars();
+  showScreen('home');
+}
+function startActivity(n) {
+  if (n===1) { showScreen('act1'); initRecog(); }
+  if (n===2) { showScreen('act2'); initMatch(); }
+  if (n===3) { showScreen('act3'); initWord(); }
+}
+function updateHomeStars() {
+  [1,2,3].forEach(n => {
+    document.getElementById('home-stars-' + n).textContent = '⭐'.repeat(actStars[n]);
+  });
+}
+function showFeedback(emoji) {
+  const el = document.getElementById('feedback');
+  el.textContent = emoji;
+  el.style.display = 'block';
+  el.style.animation = 'none';
+  setTimeout(() => { el.style.animation = 'feedbackPop 1s ease forwards'; }, 10);
+  setTimeout(() => { el.style.display = 'none'; }, 1050);
+}
+function shuffle(arr) {
+  const a=[...arr];
+  for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}
+  return a;
+}
+
+// ═══════════════════════════════════════════════════════════
+// ACTIVITY 1 — LETTER RECOGNITION
+// ═══════════════════════════════════════════════════════════
+let recogQueue = [];
+let recogIdx   = 0;
+let recogStars = 0;
+let recogAnswered = false;
+
+function initRecog() {
+  recogQueue = shuffle([...LETTERS]);
+  recogIdx = 0; recogStars = 0; recogAnswered = false;
+  renderRecogRound();
+}
+
+function renderRecogRound() {
+  recogAnswered = false;
+  const target = recogQueue[recogIdx];
+  document.getElementById('recog-target').textContent = target;
+  updateRecogProgress();
+
+  // 4 choices: target + 3 random others
+  const others = shuffle(LETTERS.filter(l => l !== target)).slice(0,3);
+  const choices = shuffle([target, ...others]);
+
+  const grid = document.getElementById('recog-choices');
+  grid.innerHTML = '';
+  choices.forEach(letter => {
+    const btn = document.createElement('button');
+    btn.className = 'letter-btn';
+    btn.textContent = letter;
+    btn.onclick = () => handleRecog(btn, letter, target);
+    grid.appendChild(btn);
+  });
+
+  // Speak the letter
+  setTimeout(() => speak(target, 0.7), 300);
+}
+
+function handleRecog(btn, chosen, target) {
+  if (recogAnswered) return;
+  recogAnswered = true;
+
+  if (chosen === target) {
+    btn.classList.add('correct');
+    showFeedback('⭐');
+    speak(target + '! Yes!');
+    recogStars++;
+    actStars[1] = Math.min(3, Math.round(recogStars / 26 * 3));
+    document.getElementById('recog-stars').innerHTML = '⭐'.repeat(actStars[1]);
+    recogIdx++;
+    if (recogIdx >= 26) {
+      setTimeout(() => { showFeedback('🎉'); speak('Amazing! You finished!'); updateHomeStars(); goHome(); }, 1000);
+    } else {
+      setTimeout(renderRecogRound, 1100);
+    }
+  } else {
+    btn.classList.add('wrong');
+    showFeedback('❌');
+    speak('Try again!');
+    // Show correct
+    document.querySelectorAll('.letter-btn').forEach(b => {
+      if (b.textContent === target) b.classList.add('correct');
+    });
+    setTimeout(renderRecogRound, 1500);
+  }
+}
+
+function updateRecogProgress() {
+  const pct = (recogIdx / 26) * 100;
+  document.getElementById('recog-progress').style.width = pct + '%';
+  document.getElementById('recog-progress-label').textContent = recogIdx + ' / 26';
+}
+
+// ═══════════════════════════════════════════════════════════
+// ACTIVITY 2 — UPPERCASE → LOWERCASE MATCH
+// ═══════════════════════════════════════════════════════════
+let matchQueue = [];
+let matchIdx   = 0;
+let matchStars = 0;
+let matchAnswered = false;
+
+function initMatch() {
+  matchQueue = shuffle([...LETTERS]);
+  matchIdx = 0; matchStars = 0; matchAnswered = false;
+  renderMatchRound();
+}
+
+function renderMatchRound() {
+  matchAnswered = false;
+  const target = matchQueue[matchIdx];
+  document.getElementById('match-upper').textContent = target;
+  updateMatchProgress();
+
+  // 8 lowercase choices
+  const others = shuffle(LETTERS.filter(l => l !== target)).slice(0,7);
+  const choices = shuffle([target, ...others]);
+
+  const grid = document.getElementById('lower-grid');
+  grid.innerHTML = '';
+  choices.forEach(letter => {
+    const btn = document.createElement('button');
+    btn.className = 'lower-btn';
+    btn.textContent = letter.toLowerCase();
+    btn.dataset.letter = letter;
+    btn.onclick = () => handleMatch(btn, letter, target);
+    grid.appendChild(btn);
+  });
+
+  // Speak: say uppercase then lowercase
+  setTimeout(() => speak(target, 0.7), 300);
+}
+
+function handleMatch(btn, chosen, target) {
+  if (matchAnswered) return;
+  matchAnswered = true;
+
+  if (chosen === target) {
+    btn.classList.add('correct');
+    showFeedback('⭐');
+    speak(target + '... ' + target.toLowerCase() + '! Great job!');
+    matchStars++;
+    actStars[2] = Math.min(3, Math.round(matchStars / 26 * 3));
+    document.getElementById('match-stars').innerHTML = '⭐'.repeat(actStars[2]);
+    matchIdx++;
+    if (matchIdx >= 26) {
+      setTimeout(() => { showFeedback('🎉'); speak('Well done! All done!'); updateHomeStars(); goHome(); }, 1000);
+    } else {
+      setTimeout(renderMatchRound, 1100);
+    }
+  } else {
+    btn.classList.add('wrong');
+    showFeedback('❌');
+    speak('Try again!');
+    document.querySelectorAll('.lower-btn').forEach(b => {
+      if (b.dataset.letter === target) b.classList.add('correct');
+    });
+    setTimeout(renderMatchRound, 1500);
+  }
+}
+
+function updateMatchProgress() {
+  const pct = (matchIdx / 26) * 100;
+  document.getElementById('match-progress').style.width = pct + '%';
+  document.getElementById('match-progress-label').textContent = matchIdx + ' / 26';
+}
+
+// ═══════════════════════════════════════════════════════════
+// ACTIVITY 3 — FIND LETTER IN WORD
+// ═══════════════════════════════════════════════════════════
+let wordQueue   = [];
+let wordIdx     = 0;
+let wordStars   = 0;
+let wordFound   = [];
+let wordAnswered = false;
+
+function initWord() {
+  // Pick 10 random letters for this session
+  wordQueue = shuffle([...LETTERS]).slice(0, 10);
+  wordIdx = 0; wordStars = 0; wordAnswered = false;
+  renderWordRound();
+}
+
+function renderWordRound() {
+  wordAnswered = false;
+  const targetLetter = wordQueue[wordIdx];
+  const entry = wordBank[targetLetter];
+  const word  = entry.word.replace(/\s/g, ''); // remove spaces for letter buttons
+
+  document.getElementById('word-target-letter').textContent = targetLetter;
+  document.getElementById('word-emoji').textContent = entry.emoji;
+  updateWordProgress();
+
+  // Build letter buttons
+  const display = document.getElementById('word-display');
+  display.innerHTML = '';
+  wordFound = [];
+
+  // Find all positions of target letter in word
+  const targetPositions = [];
+  word.split('').forEach((ch, i) => {
+    if (ch === targetLetter) targetPositions.push(i);
+  });
+
+  word.split('').forEach((ch, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'word-letter-btn';
+    btn.textContent = ch;
+    btn.dataset.idx = i;
+    btn.dataset.letter = ch;
+    btn.onclick = () => handleWordTap(btn, ch, targetLetter, targetPositions, word);
+    display.appendChild(btn);
+  });
+
+  // Speak: "Find the letter A in APPLE"
+  setTimeout(() => speak(targetLetter + '... find ' + targetLetter + ' in ' + entry.word, 0.72), 300);
+}
+
+function handleWordTap(btn, chosen, target, targetPositions, word) {
+  if (btn.classList.contains('found') || btn.classList.contains('correct')) return;
+
+  if (chosen === target) {
+    btn.classList.add('correct');
+    wordFound.push(parseInt(btn.dataset.idx));
+    speak(target + '! Yes!');
+    showFeedback('⭐');
+
+    // Check if all instances found
+    const allFound = targetPositions.every(pos => wordFound.includes(pos));
+    if (allFound) {
+      wordStars++;
+      actStars[3] = Math.min(3, Math.round(wordStars / 10 * 3));
+      document.getElementById('word-stars').innerHTML = '⭐'.repeat(actStars[3]);
+      wordIdx++;
+      if (wordIdx >= 10) {
+        setTimeout(() => { showFeedback('🎉'); speak('Amazing! You finished!'); updateHomeStars(); goHome(); }, 1000);
+      } else {
+        setTimeout(renderWordRound, 1200);
+      }
+    }
+  } else {
+    btn.classList.add('wrong');
+    showFeedback('❌');
+    speak('Try again!');
+    setTimeout(() => btn.classList.remove('wrong'), 600);
+  }
+}
+
+function updateWordProgress() {
+  const pct = (wordIdx / 10) * 100;
+  document.getElementById('word-progress').style.width = pct + '%';
+  document.getElementById('word-progress-label').textContent = wordIdx + ' / 10';
+}
+
+// ═══════════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════════
+updateHomeStars();
+</script>
+</body>
+</html>
