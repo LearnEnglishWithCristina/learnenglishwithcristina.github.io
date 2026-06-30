@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Toys! 🧸</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;700;900&display=swap');
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg1: #FCE4EC;
+    --bg2: #F8BBD0;
+    --highlight: #AD1457;
+    --accent:    #EC407A;
+    --correct: #43A047;
+    --wrong:   #E53935;
+    --card: #ffffff;
+    --text: #2c2c2c;
+  }
+
+  body {
+    font-family: 'Nunito', sans-serif;
+    background: linear-gradient(160deg, var(--bg1) 0%, var(--bg2) 100%);
+    min-height: 100vh;
+    display: flex; flex-direction: column; align-items: center;
+    padding: 10px 10px 30px; overflow-x: hidden;
+  }
+
+  .floatie {
+    position: fixed; font-size: 34px; opacity: 0.1;
+    pointer-events: none; animation: floatUp linear infinite;
+  }
+  .floatie:nth-child(1){left:5%;  animation-duration:14s; animation-delay:0s;}
+  .floatie:nth-child(2){left:20%; animation-duration:18s; animation-delay:-5s;}
+  .floatie:nth-child(3){left:55%; animation-duration:12s; animation-delay:-8s;}
+  .floatie:nth-child(4){left:80%; animation-duration:16s; animation-delay:-2s;}
+  .floatie:nth-child(5){left:40%; animation-duration:20s; animation-delay:-11s;}
+  @keyframes floatUp{from{transform:translateY(0)}to{transform:translateY(-110vh)}}
+
+  .screen { display:none; width:100%; max-width:700px; flex-direction:column; align-items:center; }
+  .screen.active { display:flex; }
+
+  /* ── TITLE ── */
+  .title-box {
+    background:var(--card); border-radius:32px; padding:44px 56px;
+    text-align:center; box-shadow:0 10px 40px rgba(173,20,87,0.18);
+    margin-top:60px; animation:bounceIn 0.6s ease;
+  }
+  @keyframes bounceIn{0%{transform:scale(0.5);opacity:0}70%{transform:scale(1.05)}100%{transform:scale(1);opacity:1}}
+  .title-emoji { font-size:84px; display:block; margin-bottom:6px; }
+  .title-text  { font-size:56px; font-weight:900; color:var(--highlight); text-shadow:3px 3px 0 #f8bbd0; }
+  .subtitle    { font-size:20px; color:#aaa; margin-top:8px; }
+
+  .big-btn {
+    margin-top:30px; background:var(--highlight); color:#fff;
+    border:none; border-radius:50px; padding:18px 52px;
+    font-size:28px; font-family:'Nunito',sans-serif; font-weight:900;
+    cursor:pointer; box-shadow:0 6px 0 #6A0E36; transition:all 0.15s;
+    animation:wiggle 2.5s ease-in-out infinite;
+  }
+  .big-btn:hover  { transform:translateY(-3px); box-shadow:0 9px 0 #6A0E36; }
+  .big-btn:active { transform:translateY(3px);  box-shadow:0 3px 0 #6A0E36; }
+  @keyframes wiggle{0%,88%,100%{transform:rotate(0deg)}91%{transform:rotate(-3deg)}95%{transform:rotate(3deg)}}
+
+  /* ── TEACHER BAR ── */
+  .teacher-bar {
+    background:rgba(0,0,0,0.72); color:#fff; border-radius:50px;
+    padding:8px 20px; display:flex; gap:10px; align-items:center;
+    margin-bottom:10px; font-size:13px; flex-wrap:wrap; justify-content:center;
+  }
+  .teacher-bar span { opacity:0.65; }
+  .t-btn {
+    background:rgba(255,255,255,0.18); border:1px solid rgba(255,255,255,0.35);
+    color:#fff; border-radius:20px; padding:4px 14px;
+    font-family:'Nunito',sans-serif; font-size:13px; cursor:pointer; transition:background 0.2s;
+  }
+  .t-btn:hover       { background:rgba(255,255,255,0.32); }
+  .t-btn.active-mode { background:var(--highlight); border-color:var(--highlight); }
+
+  .star-bar { display:flex; gap:6px; font-size:26px; margin-bottom:6px; min-height:34px; }
+
+  .progress-dots { display:flex; gap:9px; margin:4px 0 14px; flex-wrap:wrap; justify-content:center; }
+  .dot { width:13px; height:13px; border-radius:50%; background:rgba(0,0,0,0.15); transition:background 0.3s; }
+  .dot.done    { background:var(--correct); }
+  .dot.current { background:var(--highlight); transform:scale(1.35); }
+
+  /* ── LEARN CARD ── */
+  .learn-card {
+    background:var(--card); border-radius:30px; padding:28px 30px 24px;
+    text-align:center; box-shadow:0 8px 30px rgba(0,0,0,0.12);
+    width:100%; max-width:500px; animation:slideIn 0.38s ease;
+  }
+  @keyframes slideIn{from{transform:translateX(60px);opacity:0}to{transform:translateX(0);opacity:1}}
+
+  .toy-emoji-big {
+    font-size:130px; display:block; cursor:pointer; line-height:1.2;
+    filter:drop-shadow(0 5px 10px rgba(0,0,0,0.18)); transition:transform 0.2s;
+  }
+  .toy-emoji-big:hover  { transform:scale(1.12) rotate(-6deg); }
+  .toy-emoji-big:active { transform:scale(0.93); }
+
+  .toy-name {
+    font-size:50px; font-weight:900; color:var(--text); margin:8px 0 4px; letter-spacing:2px;
+  }
+  .toy-name span { color:var(--highlight); }
+  .toy-hint { font-size:17px; color:#bbb; font-style:italic; margin-bottom:10px; }
+
+  /* Descriptor badges */
+  .descriptor-row { display:flex; justify-content:center; gap:8px; margin-bottom:14px; flex-wrap:wrap; }
+  .descriptor-badge {
+    display:inline-flex; align-items:center; gap:6px;
+    border-radius:50px; padding:6px 16px; font-size:15px; font-weight:700; color:#fff;
+    cursor:pointer; transition:transform 0.15s;
+  }
+  .descriptor-badge:hover { transform:scale(1.08); }
+  .desc-colour { }
+  .desc-size   { background:#7E57C2; }
+
+  .tap-me { font-size:14px; color:#ccc; animation:blink 2s infinite; }
+  @keyframes blink{0%,100%{opacity:1}50%{opacity:0.25}}
+
+  .nav-row { display:flex; gap:14px; margin-top:14px; justify-content:center; }
+  .nav-btn {
+    background:#fff; border:3px solid #ddd; border-radius:50px;
+    padding:11px 26px; font-size:20px; font-family:'Nunito',sans-serif; font-weight:700;
+    cursor:pointer; transition:all 0.15s; color:var(--text);
+  }
+  .nav-btn:hover    { border-color:var(--highlight); color:var(--highlight); transform:scale(1.05); }
+  .nav-btn.next-btn { background:var(--highlight); color:#fff; border-color:var(--highlight); }
+  .nav-btn.next-btn:hover { color:#fff; }
+
+  /* ── QUIZ ── */
+  .quiz-card {
+    background:var(--card); border-radius:30px; padding:24px;
+    text-align:center; box-shadow:0 8px 30px rgba(0,0,0,0.12);
+    width:100%; max-width:580px; animation:slideIn 0.38s ease;
+  }
+  .quiz-label { font-size:20px; font-weight:700; color:#888; margin-bottom:4px; }
+  .quiz-word  { font-size:42px; font-weight:900; color:var(--highlight); margin-bottom:18px; }
+
+  .choices-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; }
+  @media(max-width:480px){ .choices-grid{ grid-template-columns:repeat(2,1fr); } }
+
+  .choice-btn {
+    background:#fafafa; border:4px solid #e8e8e8; border-radius:20px;
+    padding:14px 6px; font-size:50px; cursor:pointer; transition:all 0.2s;
+    display:flex; flex-direction:column; align-items:center; gap:4px;
+  }
+  .choice-btn:hover   { transform:scale(1.1); border-color:var(--highlight); background:#fce4ec; }
+  .choice-btn.correct { background:#e8f5e9; border-color:var(--correct); animation:correctBounce 0.5s ease; }
+  .choice-btn.wrong   { background:#ffebee; border-color:var(--wrong);   animation:shake 0.4s ease; }
+
+  /* ── DESCRIBE GAME ── */
+  .describe-intro {
+    background:var(--card); border-radius:24px; padding:16px 24px;
+    text-align:center; font-size:20px; font-weight:700; color:var(--highlight);
+    box-shadow:0 4px 16px rgba(0,0,0,0.08); margin-bottom:14px; width:100%; max-width:580px;
+  }
+  .describe-card {
+    background:var(--card); border-radius:30px; padding:26px 22px;
+    text-align:center; box-shadow:0 8px 28px rgba(0,0,0,0.12);
+    width:100%; max-width:560px; animation:slideIn 0.4s ease;
+  }
+  .describe-emoji { font-size:100px; display:block; margin-bottom:8px; filter:drop-shadow(0 4px 8px rgba(0,0,0,0.15)); }
+  .describe-prompt { font-size:18px; color:#aaa; margin-bottom:16px; font-weight:700; }
+
+  .describe-sentence {
+    font-family:'Fredoka One',sans-serif; font-size:24px; min-height:50px;
+    background:#fce4ec; border-radius:16px; padding:12px 18px; margin-bottom:18px;
+    border:3px solid #f8bbd0; color:var(--highlight); transition:all 0.3s;
+    display:flex; align-items:center; justify-content:center; flex-wrap:wrap; gap:8px;
+  }
+
+  .describe-choices-label { font-size:13px; color:#bbb; font-weight:700; margin-bottom:6px; }
+  .describe-choices { display:flex; flex-wrap:wrap; gap:10px; justify-content:center; margin-bottom:14px; }
+  .describe-choice-btn {
+    border:3px solid; border-radius:50px; padding:9px 20px;
+    font-family:'Fredoka One',sans-serif; font-size:18px; cursor:pointer;
+    transition:all 0.18s; color:#fff;
+  }
+  .describe-choice-btn:hover { transform:scale(1.08); }
+  .describe-choice-btn.used { opacity:0.3; pointer-events:none; }
+
+  .describe-next-btn {
+    display:none; margin-top:10px;
+    background:var(--correct); color:#fff; border:none; border-radius:50px;
+    padding:11px 30px; font-family:'Fredoka One',sans-serif; font-size:18px;
+    cursor:pointer; box-shadow:0 4px 0 #1B5E20; transition:all 0.15s;
+  }
+  .describe-next-btn.show { display:inline-block; }
+  .describe-next-btn:hover { transform:translateY(-2px); box-shadow:0 6px 0 #1B5E20; }
+
+  /* I have / I don't have buttons */
+  .have-yes-btn { background:#1565C0; border-color:#1565C0; font-size:20px; padding:14px 26px; }
+  .have-no-btn  { background:#C62828; border-color:#C62828; font-size:20px; padding:14px 26px; }
+
+  /* ── WIN ── */
+  .win-box {
+    background:var(--card); border-radius:30px; padding:44px; text-align:center;
+    box-shadow:0 10px 40px rgba(0,0,0,0.18); max-width:480px; animation:bounceIn 0.6s ease;
+  }
+  .win-emoji { font-size:84px; display:block; }
+  .win-title { font-size:44px; font-weight:900; color:var(--highlight); margin:12px 0; }
+  .win-stars { font-size:38px; margin:8px 0; }
+  .win-sub   { font-size:18px; color:#888; }
+
+  /* ── FEEDBACK ── */
+  .feedback {
+    position:fixed; top:50%; left:50%; transform:translate(-50%,-50%);
+    font-size:96px; pointer-events:none; z-index:999; display:none;
+    animation:feedbackPop 1s ease forwards;
+  }
+  @keyframes feedbackPop{0%{transform:translate(-50%,-50%) scale(0);opacity:1}50%{transform:translate(-50%,-62%) scale(1.2);opacity:1}100%{transform:translate(-50%,-82%) scale(0.9);opacity:0}}
+  @keyframes correctBounce{0%{transform:scale(1)}40%{transform:scale(1.22)}70%{transform:scale(0.96)}100%{transform:scale(1)}}
+  @keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-10px)}40%{transform:translateX(10px)}60%{transform:translateX(-8px)}80%{transform:translateX(5px)}}
+</style>
+</head>
+<body>
+
+<div class="floatie">🧸</div>
+<div class="floatie">⚽</div>
+<div class="floatie">🚗</div>
+<div class="floatie">🪀</div>
+<div class="floatie">🎈</div>
+<div class="feedback" id="feedback"></div>
+
+<!-- sound toggle -->
+<button id="sound-toggle" onclick="toggleSound()"
+  style="position:fixed;top:14px;left:18px;z-index:999;background:rgba(255,255,255,0.85);
+  border:2px solid #ccc;border-radius:50%;width:48px;height:48px;font-size:24px;
+  cursor:pointer;box-shadow:0 3px 10px rgba(0,0,0,0.15);">🔊</button>
+
+<!-- ══════════════ TITLE ══════════════ -->
+<div class="screen active" id="screen-title">
+  <div class="title-box">
+    <span class="title-emoji">🧸</span>
+    <div class="title-text">TOYS!</div>
+    <div class="subtitle">Let's learn together 🌟</div>
+    <button class="big-btn" onclick="startLesson()">▶ START</button>
+  </div>
+</div>
+
+<!-- ══════════════ LEARN ══════════════ -->
+<div class="screen" id="screen-learn">
+  <div class="teacher-bar">
+    <span>Teacher:</span>
+    <button class="t-btn active-mode" id="tl-learn"    onclick="setMode('learn')">📖 Learn</button>
+    <button class="t-btn"             id="tl-quiz"     onclick="setMode('quiz')">❓ Quiz</button>
+    <button class="t-btn"             id="tl-describe" onclick="setMode('describe')">🙋 I have...</button>
+  </div>
+  <div class="star-bar"      id="star-bar-learn"></div>
+  <div class="progress-dots" id="progress-dots"></div>
+
+  <div class="learn-card" id="learn-card">
+    <span class="toy-emoji-big" id="learn-emoji" onclick="bounce()">🧸</span>
+    <div class="toy-name"  id="learn-name">TEDDY BEAR</div>
+    <div class="toy-hint"  id="learn-hint">🔊 "teddy bear"</div>
+    <div class="descriptor-row" id="learn-descriptors"></div>
+    <div class="tap-me">👆 Tap the toy!</div>
+    <div class="nav-row">
+      <button class="nav-btn"          onclick="prevToy()">⬅ Back</button>
+      <button class="nav-btn next-btn" onclick="nextToy()">Next ➡</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ QUIZ ══════════════ -->
+<div class="screen" id="screen-quiz">
+  <div class="teacher-bar">
+    <span>Teacher:</span>
+    <button class="t-btn"             id="tq-learn"    onclick="setMode('learn')">📖 Learn</button>
+    <button class="t-btn active-mode" id="tq-quiz"     onclick="setMode('quiz')">❓ Quiz</button>
+    <button class="t-btn"             id="tq-describe" onclick="setMode('describe')">🙋 I have...</button>
+  </div>
+  <div class="star-bar" id="star-bar-quiz"></div>
+
+  <div class="quiz-card">
+    <div class="quiz-label">Find the...</div>
+    <div class="quiz-word" id="quiz-word">TEDDY BEAR</div>
+    <div class="choices-grid" id="choices-grid"></div>
+  </div>
+</div>
+
+<!-- ══════════════ DESCRIBE ══════════════ -->
+<div class="screen" id="screen-describe">
+  <div class="teacher-bar">
+    <span>Teacher:</span>
+    <button class="t-btn"             id="td-learn"    onclick="setMode('learn')">📖 Learn</button>
+    <button class="t-btn"             id="td-quiz"     onclick="setMode('quiz')">❓ Quiz</button>
+    <button class="t-btn active-mode" id="td-describe" onclick="setMode('describe')">🙋 I have...</button>
+  </div>
+  <div class="star-bar" id="star-bar-describe"></div>
+  <div class="describe-intro">🙋 Do you have this toy? Tap yes or no!</div>
+
+  <div class="describe-card">
+    <span class="describe-emoji" id="describe-emoji">🧸</span>
+    <div class="describe-prompt" id="describe-toy-name">TEDDY BEAR</div>
+    <div class="describe-sentence" id="describe-sentence">I ___ a teddy bear!</div>
+
+    <div class="describe-choices" id="have-choices" style="margin-top:10px;">
+      <button class="describe-choice-btn have-yes-btn" onclick="pickHave(true)">🙋 I have a...</button>
+      <button class="describe-choice-btn have-no-btn"  onclick="pickHave(false)">🙅 I don't have a...</button>
+    </div>
+
+    <button class="describe-next-btn" id="describe-next-btn" onclick="nextDescribeRound()">Next ➡ 🌟</button>
+  </div>
+</div>
+
+<!-- ══════════════ WIN ══════════════ -->
+<div class="screen" id="screen-win">
+  <div class="win-box">
+    <span class="win-emoji">🎉</span>
+    <div class="win-title">Amazing!</div>
+    <div class="win-stars" id="win-stars">⭐⭐⭐</div>
+    <div class="win-sub">You know all the toys!</div>
+    <button class="big-btn" style="animation:none" onclick="restartQuiz()">Play Again 🔄</button>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════
+// DATA
+// ═══════════════════════════════════════════════════
+const toys = [
+  { emoji:'🧸', name:'TEDDY BEAR', sound:'teddy bear', colour:'Brown',  hex:'#6D4C41', size:'Big'   },
+  { emoji:'⚽', name:'BALL',       sound:'ball',       colour:'White',  hex:'#9E9E9E', size:'Small' },
+  { emoji:'🚗', name:'CAR',        sound:'car',        colour:'Red',    hex:'#E53935', size:'Small' },
+  { emoji:'🪄', name:'WAND',       sound:'wand',       colour:'Purple', hex:'#8E24AA', size:'Small' },
+  { emoji:'🎈', name:'BALLOON',    sound:'balloon',    colour:'Red',    hex:'#E53935', size:'Big'   },
+  { emoji:'🪁', name:'KITE',       sound:'kite',       colour:'Blue',   hex:'#1E88E5', size:'Big'   },
+  { emoji:'🪆', name:'DOLL',       sound:'doll',       colour:'Pink',   hex:'#E91E8C', size:'Small' },
+  { emoji:'🧱', name:'LEGO',       sound:'lego',       colour:'Red',    hex:'#E53935', size:'Small' },
+];
+
+const colours = [
+  { name:'Red',    hex:'#E53935' }, { name:'Blue',   hex:'#1E88E5' },
+  { name:'Yellow', hex:'#FBC02D' }, { name:'Green',  hex:'#43A047' },
+  { name:'Orange', hex:'#FB8C00' }, { name:'Purple', hex:'#8E24AA' },
+];
+const sizes = [
+  { name:'Big',   hex:'#7E57C2' },
+  { name:'Small', hex:'#5C6BC0' },
+];
+
+// ═══════════════════════════════════════════════════
+// TTS
+// ═══════════════════════════════════════════════════
+let ttsReady=false, soundOn=true, ttsVoice=null;
+function unlockTTS(){
+  if(ttsReady)return; ttsReady=true;
+  const u=new SpeechSynthesisUtterance(' '); u.volume=0;
+  window.speechSynthesis.speak(u); pickVoice();
+}
+function pickVoice(){
+  const v=window.speechSynthesis.getVoices();
+  ttsVoice=v.find(x=>x.lang==='en-US'&&x.localService)||
+           v.find(x=>x.lang==='en-US')||
+           v.find(x=>x.lang.startsWith('en-'))||
+           v.find(x=>x.lang.startsWith('en'))||v[0]||null;
+}
+if(window.speechSynthesis){ window.speechSynthesis.onvoiceschanged=pickVoice; pickVoice(); }
+function speak(text,rate=0.6){
+  if(!soundOn||!window.speechSynthesis)return;
+  window.speechSynthesis.cancel();
+  const u=new SpeechSynthesisUtterance(text);
+  u.rate=rate; u.pitch=1.05; u.volume=1;
+  if(ttsVoice)u.voice=ttsVoice;
+  window.speechSynthesis.speak(u);
+}
+function toggleSound(){
+  soundOn=!soundOn;
+  document.getElementById('sound-toggle').textContent=soundOn?'🔊':'🔇';
+}
+document.addEventListener('touchstart',unlockTTS,{once:true});
+document.addEventListener('mousedown', unlockTTS,{once:true});
+
+// ═══════════════════════════════════════════════════
+// SCREENS & STATE
+// ═══════════════════════════════════════════════════
+let current=0, stars=0, quizAnswered=false;
+
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('screen-'+id).classList.add('active');
+}
+function startLesson(){ showScreen('learn'); renderProgress(); updateLearnCard(); renderStars(); }
+
+function setMode(m){
+  ['learn','quiz','describe'].forEach(mode=>{
+    ['tl','tq','td'].forEach(prefix=>{
+      const el=document.getElementById(prefix+'-'+mode);
+      if(el) el.className='t-btn'+(mode===m?' active-mode':'');
+    });
+  });
+  if(m==='learn')    { showScreen('learn');    renderProgress(); updateLearnCard(); renderStars(); }
+  if(m==='quiz')     { showScreen('quiz');     renderStars(); newQuiz(); }
+  if(m==='describe') { showScreen('describe'); renderStars(); initDescribe(); }
+}
+
+// ═══════════════════════════════════════════════════
+// LEARN
+// ═══════════════════════════════════════════════════
+function updateLearnCard(){
+  const t=toys[current];
+  document.getElementById('learn-emoji').textContent=t.emoji;
+  document.getElementById('learn-name').innerHTML=
+    '<span>'+t.name[0]+'</span>'+t.name.slice(1).toLowerCase();
+  document.getElementById('learn-hint').textContent='🔊 "'+t.sound+'"';
+
+  // Use this toy's own real-world colour and size
+  const row=document.getElementById('learn-descriptors');
+  row.innerHTML=`
+    <span class="descriptor-badge" style="background:${t.hex}" onclick="speak('${t.colour}',0.65)">🎨 ${t.colour}</span>
+    <span class="descriptor-badge desc-size" onclick="speak('${t.size}',0.65)">📏 ${t.size}</span>
+  `;
+
+  renderProgress();
+  speak(t.name, 0.6);
+}
+function nextToy(){
+  if(current<toys.length-1){ current++; animateCard(); updateLearnCard(); }
+  else showFeedback('🌟');
+}
+function prevToy(){ if(current>0){ current--; updateLearnCard(); } }
+function animateCard(){
+  const c=document.getElementById('learn-card');
+  c.style.animation='none';
+  setTimeout(()=>{ c.style.animation='slideIn 0.38s ease'; },10);
+}
+function bounce(){
+  const el=document.getElementById('learn-emoji');
+  el.style.transform='scale(1.3) rotate(-8deg)';
+  setTimeout(()=>{ el.style.transform=''; },280);
+  speak(toys[current].name, 0.6);
+  showFeedback(toys[current].emoji);
+}
+function renderProgress(){
+  const dots=document.getElementById('progress-dots');
+  dots.innerHTML='';
+  toys.forEach((_,i)=>{
+    const d=document.createElement('div');
+    d.className='dot'+(i<current?' done':'')+(i===current?' current':'');
+    dots.appendChild(d);
+  });
+}
+
+// ═══════════════════════════════════════════════════
+// STARS
+// ═══════════════════════════════════════════════════
+function addStar(){ stars++; renderStars(); }
+function renderStars(){
+  ['star-bar-learn','star-bar-quiz','star-bar-describe'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(!el)return; el.innerHTML='';
+    for(let i=0;i<stars;i++){ const s=document.createElement('span'); s.textContent='⭐'; el.appendChild(s); }
+  });
+}
+
+// ═══════════════════════════════════════════════════
+// QUIZ
+// ═══════════════════════════════════════════════════
+function newQuiz(){
+  quizAnswered=false;
+  const correctIdx=Math.floor(Math.random()*toys.length);
+  const correct=toys[correctIdx];
+  document.getElementById('quiz-word').textContent=correct.name;
+  speak(correct.name, 0.6);
+
+  const others=[...toys.filter((_,i)=>i!==correctIdx)];
+  const choices=[correct,...others];
+  for(let i=choices.length-1;i>0;i--){
+    const j=Math.floor(Math.random()*(i+1));
+    [choices[i],choices[j]]=[choices[j],choices[i]];
+  }
+
+  const grid=document.getElementById('choices-grid');
+  grid.innerHTML='';
+  choices.forEach(t=>{
+    const btn=document.createElement('button');
+    btn.className='choice-btn';
+    btn.dataset.name=t.name;
+    btn.innerHTML=`<span>${t.emoji}</span>`;
+    btn.onclick=()=>handleQuiz(btn,t.name,correct.name);
+    grid.appendChild(btn);
+  });
+}
+function handleQuiz(btn,chosen,correct){
+  if(quizAnswered)return; quizAnswered=true;
+  if(chosen===correct){
+    btn.classList.add('correct'); showFeedback('⭐'); addStar();
+    speak(correct+'! Great job!', 0.6);
+    setTimeout(newQuiz,1300);
+  } else {
+    btn.classList.add('wrong'); showFeedback('❌'); speak('Try again!', 0.6);
+    document.querySelectorAll('.choice-btn').forEach(b=>{ if(b.dataset.name===correct) b.classList.add('correct'); });
+    setTimeout(newQuiz,1600);
+  }
+}
+
+// ═══════════════════════════════════════════════════
+// "I HAVE / I DON'T HAVE" GAME
+// ═══════════════════════════════════════════════════
+let describeQueue=[], describeIdx=0;
+
+function initDescribe(){
+  describeQueue=shuffle([...toys]);
+  describeIdx=0;
+  renderDescribeRound();
+}
+
+function renderDescribeRound(){
+  const toy=describeQueue[describeIdx];
+  const isPlural = toy.name === 'LEGO';
+  document.getElementById('describe-emoji').textContent=toy.emoji;
+  document.getElementById('describe-toy-name').textContent=toy.name;
+  document.getElementById('describe-sentence').textContent = isPlural
+    ? 'I ___ '+toy.name.toLowerCase()+'!'
+    : 'I ___ a '+toy.name.toLowerCase()+'!';
+  document.getElementById('describe-next-btn').classList.remove('show');
+  document.querySelectorAll('.have-yes-btn, .have-no-btn').forEach(b=>b.classList.remove('used'));
+
+  const question = isPlural
+    ? 'Do you have '+toy.name.toLowerCase()+'?'
+    : 'Do you have a '+toy.name.toLowerCase()+'?';
+  setTimeout(()=>speak(question, 0.6), 300);
+}
+
+function pickHave(hasIt){
+  const toy=describeQueue[describeIdx];
+  const isPlural = toy.name === 'LEGO';
+  document.querySelectorAll('.have-yes-btn, .have-no-btn').forEach(b=>b.classList.add('used'));
+
+  const sentence = isPlural
+    ? (hasIt ? 'I have '+toy.name.toLowerCase()+'!' : "I don't have "+toy.name.toLowerCase()+'!')
+    : (hasIt ? 'I have a '+toy.name.toLowerCase()+'!' : "I don't have a "+toy.name.toLowerCase()+'!');
+
+  document.getElementById('describe-sentence').textContent = sentence;
+
+  speak(sentence, 0.58);
+  showFeedback(hasIt?'🙋':'🙅');
+  addStar();
+  document.getElementById('describe-next-btn').classList.add('show');
+}
+
+function nextDescribeRound(){
+  describeIdx++;
+  if(describeIdx>=describeQueue.length){
+    showFeedback('🎉'); speak('Amazing! Well done!', 0.6);
+    setTimeout(()=>{ showScreen('win'); document.getElementById('win-stars').textContent='⭐'.repeat(Math.min(5,stars)); },1000);
+  } else {
+    renderDescribeRound();
+  }
+}
+
+function restartQuiz(){ stars=0; current=0; setMode('quiz'); }
+
+// ═══════════════════════════════════════════════════
+// UTILS
+// ═══════════════════════════════════════════════════
+function shuffle(arr){
+  const a=[...arr];
+  for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}
+  return a;
+}
+function showFeedback(emoji){
+  const el=document.getElementById('feedback');
+  el.textContent=emoji; el.style.display='block'; el.style.animation='none';
+  setTimeout(()=>{ el.style.animation='feedbackPop 1s ease forwards'; },10);
+  setTimeout(()=>{ el.style.display='none'; },1050);
+}
+</script>
+</body>
+</html>
