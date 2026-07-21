@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Learn English with Cristina! 🌟</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;700;900&display=swap');
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --sky: #E3F2FD;
+    --card: #ffffff;
+    --text: #2c2c2c;
+    --highlight: #E64A19;
+  }
+
+  body {
+    font-family: 'Nunito', sans-serif;
+    min-height: 100vh;
+    background: linear-gradient(160deg, #E3F2FD 0%, #E8F5E9 100%);
+    padding: 20px 16px 60px;
+  }
+
+  /* ── HEADER ── */
+  .header {
+    text-align: center;
+    padding: 30px 20px 20px;
+    max-width: 700px;
+    margin: 0 auto 30px;
+  }
+  .header-emoji { font-size: 72px; display: block; margin-bottom: 8px; }
+  .header-title {
+    font-family: 'Fredoka One', sans-serif;
+    font-size: 42px; color: var(--highlight);
+    text-shadow: 3px 3px 0 #ffd0c0;
+    line-height: 1.1; margin-bottom: 8px;
+  }
+  .header-sub { font-size: 18px; color: #888; }
+
+  /* Sun decoration */
+  .sun { position: fixed; top: 16px; right: 24px; font-size: 52px; pointer-events: none;
+    animation: sunPulse 4s ease-in-out infinite; }
+  @keyframes sunPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.1)}}
+
+  /* ── SECTION ── */
+  .section { max-width: 700px; margin: 0 auto 30px; }
+  .section-title {
+    font-family: 'Fredoka One', sans-serif;
+    font-size: 26px; color: #555;
+    margin-bottom: 14px; padding-left: 4px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .section-title::after {
+    content: ''; flex: 1; height: 2px;
+    background: linear-gradient(to right, #ddd, transparent);
+    border-radius: 2px;
+  }
+
+  /* ── CARDS ── */
+  .cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 14px;
+  }
+
+  .lesson-card {
+    background: var(--card);
+    border-radius: 22px;
+    padding: 22px 14px 18px;
+    text-align: center;
+    box-shadow: 0 5px 18px rgba(0,0,0,0.09);
+    cursor: pointer;
+    transition: all 0.22s;
+    text-decoration: none;
+    border: 3px solid transparent;
+    display: flex; flex-direction: column; align-items: center;
+    animation: fadeIn 0.5s ease both;
+  }
+  .lesson-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 28px rgba(0,0,0,0.14);
+  }
+
+  @keyframes fadeIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+
+  /* Card colour themes */
+  .card-orange:hover { border-color: #E64A19; }
+  .card-blue:hover   { border-color: #1565C0; }
+  .card-green:hover  { border-color: #2E7D32; }
+  .card-purple:hover { border-color: #6A1B9A; }
+  .card-teal:hover   { border-color: #00796B; }
+  .card-pink:hover   { border-color: #C2185B; }
+  .card-yellow:hover { border-color: #F57F17; }
+  .card-red:hover    { border-color: #C62828; }
+
+  .card-icon  { font-size: 52px; display: block; margin-bottom: 10px; }
+  .card-title {
+    font-family: 'Fredoka One', sans-serif;
+    font-size: 17px; color: var(--text); margin-bottom: 4px;
+  }
+  .card-sub   { font-size: 12px; color: #aaa; }
+
+  /* Badge */
+  .card-badge {
+    display: inline-block; border-radius: 50px;
+    padding: 3px 12px; font-size: 11px; font-weight: 900;
+    color: #fff; margin-top: 8px;
+  }
+  .badge-lesson   { background: #1565C0; }
+  .badge-homework { background: #2E7D32; }
+
+  /* ── COMING SOON ── */
+  .card-soon {
+    opacity: 0.5; cursor: default;
+  }
+  .card-soon:hover { transform: none; box-shadow: 0 5px 18px rgba(0,0,0,0.09); }
+  .soon-label {
+    font-size: 11px; color: #bbb; font-style: italic; margin-top: 6px;
+  }
+
+  /* ── FOOTER ── */
+  .footer {
+    text-align: center; max-width: 700px; margin: 20px auto 0;
+    font-size: 14px; color: #bbb;
+  }
+  .footer span { color: var(--highlight); font-weight: 700; }
+
+  /* Clouds */
+  .cloud { position:fixed; font-size:40px; opacity:0.6; pointer-events:none; animation:driftCloud linear infinite; }
+  .cloud:nth-child(2){top:20px; animation-duration:28s; animation-delay:0s;}
+  .cloud:nth-child(3){top:60px; font-size:28px; animation-duration:36s; animation-delay:-15s;}
+  @keyframes driftCloud{from{left:-120px}to{left:110%}}
+</style>
+</head>
+<body>
+
+<div class="sun">☀️</div>
+<div class="cloud">☁️</div>
+<div class="cloud">☁️</div>
+
+<div class="header">
+  <span class="header-emoji">👩‍🏫</span>
+  <div class="header-title">Learn English<br>with Cristina!</div>
+  <div class="header-sub">Click a lesson to start learning! 🌟</div>
+</div>
+
+<!-- ── LESSONS ── -->
+<div class="section">
+  <div class="section-title">📖 Lessons</div>
+  <div class="cards-grid">
+
+    <a class="lesson-card card-blue" href="greetings_lesson_5yo.html">
+      <span class="card-icon">👋</span>
+      <div class="card-title">Greetings</div>
+      <div class="card-sub">Hello, feelings & goodbye</div>
+      <span class="card-badge badge-lesson">Lesson</span>
+    </a>
+
+    <a class="lesson-card card-orange" href="animals_lesson_5yo.html">
+      <span class="card-icon">🐾</span>
+      <div class="card-title">Animals Part 1</div>
+      <div class="card-sub">Dog, cat, lion & more</div>
+      <span class="card-badge badge-lesson">Lesson</span>
+    </a>
+
+    <a class="lesson-card card-teal" href="animals2_lesson_5yo.html">
+      <span class="card-icon">🦒</span>
+      <div class="card-title">Animals Part 2</div>
+      <div class="card-sub">Giraffe, shark, cow & more</div>
+      <span class="card-badge badge-lesson">Lesson</span>
+    </a>
+
+    <a class="lesson-card card-orange" href="food_lesson_5yo.html">
+      <span class="card-icon">🍎</span>
+      <div class="card-title">Food Part 1</div>
+      <div class="card-sub">Apple, pizza, egg & more</div>
+      <span class="card-badge badge-lesson">Lesson</span>
+    </a>
+
+    <a class="lesson-card card-green" href="food_part2_lesson_5yo.html">
+      <span class="card-icon">🍜</span>
+      <div class="card-title">Food Part 2</div>
+      <div class="card-sub">Fish, noodles, cake & more</div>
+      <span class="card-badge badge-lesson">Lesson</span>
+    </a>
+
+    <a class="lesson-card card-yellow" href="alphabet_lesson_5yo.html">
+      <span class="card-icon">🔤</span>
+      <div class="card-title">Alphabet</div>
+      <div class="card-sub">ABC song, sounds & quiz</div>
+      <span class="card-badge badge-lesson">Lesson</span>
+    </a>
+
+    <a class="lesson-card card-pink" href="toys_lesson_5yo.html">
+      <span class="card-icon">🧸</span>
+      <div class="card-title">Toys</div>
+      <div class="card-sub">Teddy, ball, doll & more</div>
+      <span class="card-badge badge-lesson">Lesson</span>
+    </a>
+
+    <a class="lesson-card card-blue" href="body_parts_lesson_5yo.html">
+      <span class="card-icon">🧍</span>
+      <div class="card-title">Body Parts</div>
+      <div class="card-sub">Head, hands, feet & more</div>
+      <span class="card-badge badge-lesson">Lesson</span>
+    </a>
+
+    <a class="lesson-card card-blue" href="classroom_lesson_5yo.html">
+      <span class="card-icon">🏫</span>
+      <div class="card-title">In the Classroom</div>
+      <div class="card-sub">Book, pencil, chair & more</div>
+      <span class="card-badge badge-lesson">Lesson</span>
+    </a>
+
+    <a class="lesson-card card-green" href="playground_lesson_5yo.html">
+      <span class="card-icon">🛝</span>
+      <div class="card-title">The Playground</div>
+      <div class="card-sub">Slide, swing, sandbox & more</div>
+      <span class="card-badge badge-lesson">Lesson</span>
+    </a>
+
+  </div>
+</div>
+
+<!-- ── HOMEWORK ── -->
+<div class="section">
+  <div class="section-title">📝 Homework</div>
+  <div class="cards-grid">
+
+    <a class="lesson-card card-green" href="homework_animals_colours.html">
+      <span class="card-icon">🏠</span>
+      <div class="card-title">Animals & Colours</div>
+      <div class="card-sub">Memory, colour it, feed the animal</div>
+      <span class="card-badge badge-homework">Homework</span>
+    </a>
+
+    <a class="lesson-card card-purple" href="homework_alphabet.html">
+      <span class="card-icon">📝</span>
+      <div class="card-title">Alphabet</div>
+      <div class="card-sub">Find the letter, big & small</div>
+      <span class="card-badge badge-homework">Homework</span>
+    </a>
+
+    <a class="lesson-card card-orange" href="homework_food1.html">
+      <span class="card-icon">🍽️</span>
+      <div class="card-title">Food Part 1</div>
+      <div class="card-sub">I like / I don't like</div>
+      <span class="card-badge badge-homework">Homework</span>
+    </a>
+
+    <a class="lesson-card card-purple" href="homework_sentences1.html">
+      <span class="card-icon">💬</span>
+      <div class="card-title">Sentences 1</div>
+      <div class="card-sub">This is a...</div>
+      <span class="card-badge badge-homework">Homework</span>
+    </a>
+
+    <a class="lesson-card card-green" href="homework_sentences_colours.html">
+      <span class="card-icon">🌈</span>
+      <div class="card-title">Colour Sentences</div>
+      <div class="card-sub">I like / I don't like + colours</div>
+      <span class="card-badge badge-homework">Homework</span>
+    </a>
+
+  </div>
+</div>
+
+<!-- ── COMING SOON ── -->
+<div class="section">
+  <div class="section-title">🔜 Coming Soon</div>
+  <div class="cards-grid">
+
+    <div class="lesson-card card-soon">
+      <span class="card-icon">🎨</span>
+      <div class="card-title">Colours</div>
+      <div class="soon-label">Coming soon!</div>
+    </div>
+
+    <div class="lesson-card card-soon">
+      <span class="card-icon">🔢</span>
+      <div class="card-title">Numbers</div>
+      <div class="soon-label">Coming soon!</div>
+    </div>
+
+  </div>
+</div>
+
+<div class="footer">
+  Made with ❤️ by <span>Cristina</span> • Learn English with Cristina
+</div>
+
+</body>
+</html>
